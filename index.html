@@ -642,6 +642,7 @@
 
     /* ── RESPONSIVE ───────────────────────────────────────── */
     @media (max-width: 600px) {
+      html, body { overflow-x: hidden; max-width: 100vw; }
       .main { padding: 32px 20px 80px; }
       .match-teams { font-size: 13px; }
       .match-flag { font-size: 15px; }
@@ -1773,8 +1774,8 @@
     if (selected.length === 0) return;
 
     const msg = selected.length === 1
-      ? `This will open 1 Google Calendar tab.\n\nIf your browser blocks it, look for a popup permission prompt in the address bar and click "Allow".`
-      : `This will open ${selected.length} Google Calendar tabs — one per meeting.\n\nYour browser will likely block the first popup. Look for a popup permission prompt in the address bar, click "Allow", then press the button again.`;
+      ? `Opening 1 Google Calendar tab.\n\nIf your browser blocks it, click "Allow" in the address bar and try again.`
+      : `Opening ${selected.length} Google Calendar tabs — one per meeting.\n\nIf your browser blocks popups, click "Allow" in the address bar and try again.\n\nStill not working? Use the "+ Google Cal" buttons on each event instead.`;
 
     if (!confirm(msg)) return;
 
