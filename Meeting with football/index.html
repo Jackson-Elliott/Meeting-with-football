@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Meeting with Football</title>
+  <meta name="description" content="Block your calendar for the 2026 World Cup without blowing your cover. Totally legitimate business meetings.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚽%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #f6ff00;
+      --accent-dim: #c8d100;
+      --accent-glow: rgba(246,255,0,0.12);
+      --pitch-green: #086d1f;
+      --pitch-stripe-a: #0c420d;
+      --pitch-stripe-b: #1a611b;
+      --bg: #030804;
+      --bg-card: #0a120a;
+      --bg-hover: #111911;
+      --border: #1c2b1c;
+      --border-active: #2e462e;
+      --text: #ffffff;
+      --text-muted: #a0a0a0;
+      --text-very-muted: #606060;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: #fff;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ── HERO — FOOTBALL PITCH ────────────────────────────── */
+    .hero-pitch {
+      position: relative;
+      width: 100%;
+      min-height: 100svh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Horizontal grass stripes — row height = 1/7 of viewport width */
+    .hero-pitch::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        180deg,
+        #0c420d 0, #0c420d calc(100vw / 7),
+        #1a611b calc(100vw / 7), #1a611b calc(200vw / 7)
+      );
+    }
+
+    /* Vertical stripes at multiply blend — exactly 7 columns across the screen */
+    .pitch-vertical-stripes {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        #62c764 0, #62c764 calc(100vw / 7),
+        #2ab32c calc(100vw / 7), #2ab32c calc(200vw / 7)
+      );
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    /* Dark radial vignette — scales with viewport, darkens corners */
+    .pitch-vignette {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 70% at 50% 50%,
+          transparent 30%,
+          rgba(1,30,8,0.55) 65%,
+          rgba(0,12,3,0.92) 100%);
+      pointer-events: none;
+    }
+
+    /* Top bar — match count + credit */
+    .hero-topbar a {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .hero-topbar a::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 100%;
+      height: 1px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 0.3s ease;
+    }
+    .hero-topbar a:hover::after {
+      transform: scaleX(1);
+    }
+    .hero-topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      padding: 28px 40px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      pointer-events: none;
+    }
+
+    /* Floating calendar card — locked to one grid square (100vw/7 × 100vw/7) */
+    .pitch-card {
+      position: absolute;
+      width: calc(100vw / 7);
+      padding: calc(100vw / 7 * 0.08);
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+    .pitch-card svg { display: block; width: 100%; height: auto; }
+
+    /* Hero centred content */
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 40px 24px;
+      max-width: 720px;
+    }
+
+    .hero-trophy {
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 16px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .hero-content h1 {
+      font-family: 'Boldonse', 'Impact', sans-serif;
+      font-size: clamp(32px, 3.66vw, 63px);
+      line-height: 1.345;
+      letter-spacing: 0.02em;
+      color: #f6ff00;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      overflow-wrap: anywhere;
+      text-shadow: 0 4px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .hero-content p {
+      font-size: clamp(16px, 1.33vw, 23px);
+      font-weight: 500;
+      color: #fff;
+      line-height: 1.48;
+      margin-bottom: 0;
+      max-width: 656px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f6ff00;
+      color: #000;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      min-width: 147px;
+      height: 36px;
+      padding: 0 19px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: all 0.2s;
+      margin-top: 28px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .hero-cta:hover {
+      background: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    /* Scroll indicator */
+    .hero-scroll {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,0.3);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      animation: bounce 2.4s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── MAIN LAYOUT ──────────────────────────────────────── */
+    .main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 56px 24px 120px;
+    }
+
+    /* ── STEPS ────────────────────────────────────────────── */
+    .step {
+      margin-bottom: 56px;
+      scroll-margin-top: 48px;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .step-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid rgba(246,255,0,0.25);
+      padding: 4px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .step h2 {
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .step-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      margin-top: 4px;
+    }
+
+    /* ── PICKER ROW ───────────────────────────────────────── */
+    .picker-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .styled-select-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .styled-select {
+      width: 100%;
+      appearance: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border-active);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 14px 44px 14px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .styled-select:focus { border-color: var(--accent); }
+    .styled-select option, .styled-select optgroup { background: #0e1a0e; }
+
+    .styled-select-wrap .select-arrow {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-muted);
+    }
+
+    /* ── TAGS ─────────────────────────────────────────────── */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+      min-height: 0;
+    }
+
+    .selection-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(246,255,0,0.08);
+      border: 1px solid rgba(246,255,0,0.3);
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .tag-meta {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-left: 1px solid var(--border-active);
+      padding-left: 10px;
+    }
+
+    .tag-remove {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0;
+      transition: color 0.12s;
+      font-weight: 400;
+    }
+
+    .tag-remove:hover { color: #fff; }
+
+    /* ── MATCH CONTROLS ───────────────────────────────────── */
+    .match-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .match-count { font-size: 14px; color: var(--text-muted); }
+    .match-count strong { color: var(--accent); }
+
+    .btn-ghost {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-ghost:hover { border-color: var(--border-active); color: var(--text); }
+
+    .btn-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    .tz-badge {
+      font-size: 12px;
+      color: var(--text-very-muted);
+      padding: 5px 10px;
+      border-radius: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: default;
+    }
+
+    /* ── INDUSTRY DROPDOWN ────────────────────────────────── */
+    .industry-select-wrap {
+      position: relative;
+      max-width: 420px;
+    }
+
+    .industry-select {
+      width: 100%;
+      appearance: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border-active);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 14px 44px 14px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .industry-select:focus {
+      border-color: var(--accent);
+    }
+
+    .industry-select option { background: #1a1a1a; }
+
+    .select-arrow {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-muted);
+    }
+
+    /* ── PREVIEW SECTION ──────────────────────────────────── */
+    .preview-empty {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--text-very-muted);
+      font-size: 15px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+    }
+
+    .preview-empty .emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+
+    .preview-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .preview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .preview-meeting-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .editable-title {
+      cursor: text;
+      border-radius: 4px;
+      padding: 1px 5px;
+      margin: -1px -5px;
+      outline: none;
+      transition: background 0.15s, box-shadow 0.15s;
+      min-width: 4ch;
+    }
+    .editable-title:hover {
+      background: rgba(255,255,255,0.07);
+    }
+    .editable-title:focus {
+      background: rgba(255,255,255,0.1);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.2);
+    }
+    .editable-title:empty::before {
+      content: 'Enter a title…';
+      opacity: 0.35;
+      font-weight: 400;
+    }
+    .edit-hint {
+      font-size: 10px;
+      font-weight: 400;
+      opacity: 0;
+      color: var(--text-muted);
+      letter-spacing: 0;
+      transition: opacity 0.2s;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .preview-card:hover .edit-hint {
+      opacity: 0.5;
+    }
+
+    .preview-meeting-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .preview-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .gcal-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(66,133,244,0.1);
+      border: 1px solid rgba(66,133,244,0.3);
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 12px;
+      color: #7ab4f8;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .gcal-link:hover {
+      background: rgba(66,133,244,0.2);
+      border-color: rgba(66,133,244,0.6);
+    }
+
+    .preview-desc {
+      font-size: 12px;
+      color: var(--text-very-muted);
+      font-style: italic;
+    }
+
+    .preview-actual {
+      font-size: 11px;
+      color: var(--text-very-muted);
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+    }
+
+    /* ── EXPORT ACTIONS ───────────────────────────────────── */
+    .export-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .cal-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 15px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-active);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      text-align: left;
+    }
+
+    .cal-btn .cal-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    .cal-btn .cal-label { display: flex; flex-direction: column; gap: 1px; }
+    .cal-btn .cal-label span { font-size: 11px; font-weight: 400; opacity: 0.55; }
+
+    .cal-btn-google {
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+    .cal-btn-google .cal-icon { background: #4285f4; }
+    .cal-btn-google:hover { background: rgba(66,133,244,0.12); border-color: #4285f4; transform: translateY(-1px); }
+
+    .cal-btn-ics {
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+    .cal-btn-ics .cal-icon { background: rgba(246,255,0,0.12); border: 1px solid rgba(246,255,0,0.3); }
+    .cal-btn-ics:hover { background: rgba(246,255,0,0.07); border-color: rgba(246,255,0,0.5); transform: translateY(-1px); }
+
+    .export-note {
+      font-size: 12px;
+      color: var(--text-very-muted);
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── FOOTER ───────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-very-muted);
+    }
+
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ── DIVIDER ──────────────────────────────────────────── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 48px 0;
+    }
+
+    /* ── RESPONSIVE ───────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .main { padding: 32px 20px 80px; }
+      .match-teams { font-size: 13px; }
+      .match-flag { font-size: 15px; }
+      .picker-row { grid-template-columns: 1fr; }
+      .export-actions { grid-template-columns: 1fr; }
+      .cal-btn { width: 100%; }
+      /* Hide outer pitch blocks on small screens to avoid clutter */
+      .pitch-block:nth-child(1),
+      .pitch-block:nth-child(5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════ HERO ═══════════════════════════════════ -->
+  <section class="hero-pitch">
+
+    <!-- Vertical pitch stripes (multiply blend creates the grid) -->
+    <div class="pitch-vertical-stripes"></div>
+
+    <!-- Dark radial vignette -->
+    <div class="pitch-vignette"></div>
+
+    <!-- Top bar: match count left, credit right -->
+    <div class="hero-topbar">
+      <span id="heroMatchCount">0 Meetings Set</span>
+      <a href="https://willandjackson.com/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;opacity:1;">Created by Jackson Elliott</a>
+    </div>
+
+    <!-- Floating calendar cards — each locked to one 100vw/7 grid square -->
+    <!-- col 3, row 0 -->
+    <div class="pitch-card" style="left:calc(3*100vw/7);top:calc(0*100vw/7)"><svg viewBox="0 0 215 90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="215" height="90" rx="10" fill="white" fill-opacity="0.2"/><rect x="0.5" y="0.5" width="214" height="89" rx="9.5" stroke="white" stroke-opacity="0.5"/><rect x="11" y="14" width="121" height="16" rx="8" fill="white" fill-opacity="0.6"/><rect x="11" y="38" width="159" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><rect x="11" y="59" width="84" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><circle cx="195.5" cy="21.5" r="7.5" fill="#F7FF00"/></svg></div>
+    <!-- col 5, row 0 (top edge, partially clipped) -->
+    <div class="pitch-card" style="left:calc(5*100vw/7);top:calc(-0.3*100vw/7)"><svg viewBox="0 0 215 90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="215" height="90" rx="10" fill="white" fill-opacity="0.2"/><rect x="0.5" y="0.5" width="214" height="89" rx="9.5" stroke="white" stroke-opacity="0.5"/><rect x="11" y="14" width="121" height="16" rx="8" fill="white" fill-opacity="0.6"/><rect x="11" y="38" width="159" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><rect x="11" y="59" width="84" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><circle cx="195.5" cy="21.5" r="7.5" fill="#F7FF00"/></svg></div>
+    <!-- col 1, row 1 -->
+    <div class="pitch-card" style="left:calc(1*100vw/7);top:calc(1*100vw/7)"><svg viewBox="0 0 215 90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="215" height="90" rx="10" fill="white" fill-opacity="0.2"/><rect x="0.5" y="0.5" width="214" height="89" rx="9.5" stroke="white" stroke-opacity="0.5"/><rect x="11" y="14" width="121" height="16" rx="8" fill="white" fill-opacity="0.6"/><rect x="11" y="38" width="159" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><rect x="11" y="59" width="84" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><circle cx="195.5" cy="21.5" r="7.5" fill="#F7FF00"/></svg></div>
+    <!-- col 0, row 2 (left edge, partially clipped) -->
+    <div class="pitch-card" style="left:calc(0*100vw/7);top:calc(2*100vw/7)"><svg viewBox="0 0 215 90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="215" height="90" rx="10" fill="white" fill-opacity="0.2"/><rect x="0.5" y="0.5" width="214" height="89" rx="9.5" stroke="white" stroke-opacity="0.5"/><rect x="11" y="14" width="121" height="16" rx="8" fill="white" fill-opacity="0.6"/><rect x="11" y="38" width="159" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><rect x="11" y="59" width="84" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><circle cx="195.5" cy="21.5" r="7.5" fill="#F7FF00"/></svg></div>
+    <!-- col 6, row 2 -->
+    <div class="pitch-card" style="left:calc(6*100vw/7);top:calc(2*100vw/7)"><svg viewBox="0 0 215 90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="215" height="90" rx="10" fill="white" fill-opacity="0.2"/><rect x="0.5" y="0.5" width="214" height="89" rx="9.5" stroke="white" stroke-opacity="0.5"/><rect x="11" y="14" width="121" height="16" rx="8" fill="white" fill-opacity="0.6"/><rect x="11" y="38" width="159" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><rect x="11" y="59" width="84" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><circle cx="195.5" cy="21.5" r="7.5" fill="#F7FF00"/></svg></div>
+    <!-- col 5, row 3 -->
+    <div class="pitch-card" style="left:calc(5*100vw/7);top:calc(3*100vw/7)"><svg viewBox="0 0 215 90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="215" height="90" rx="10" fill="white" fill-opacity="0.2"/><rect x="0.5" y="0.5" width="214" height="89" rx="9.5" stroke="white" stroke-opacity="0.5"/><rect x="11" y="14" width="121" height="16" rx="8" fill="white" fill-opacity="0.6"/><rect x="11" y="38" width="159" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><rect x="11" y="59" width="84" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><circle cx="195.5" cy="21.5" r="7.5" fill="#F7FF00"/></svg></div>
+    <!-- col 2, row 4 (bottom edge, partially clipped) -->
+    <div class="pitch-card" style="left:calc(2*100vw/7);top:calc(4*100vw/7)"><svg viewBox="0 0 215 90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="215" height="90" rx="10" fill="white" fill-opacity="0.2"/><rect x="0.5" y="0.5" width="214" height="89" rx="9.5" stroke="white" stroke-opacity="0.5"/><rect x="11" y="14" width="121" height="16" rx="8" fill="white" fill-opacity="0.6"/><rect x="11" y="38" width="159" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><rect x="11" y="59" width="84" height="13" rx="6.5" fill="white" fill-opacity="0.2"/><circle cx="195.5" cy="21.5" r="7.5" fill="#F7FF00"/></svg></div>
+
+    <!-- Central content -->
+    <div class="hero-content">
+      <img src="data:image/png;base64,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" alt="World Cup Trophy" class="hero-trophy">
+      <h1>I'VE GOT A MEETING<br>WITH FOOTBALL</h1>
+      <p>Some appointments are non-negotiable.</p>
+      <a href="#step1" class="hero-cta" onclick="event.preventDefault();document.getElementById('step1').scrollIntoView({behavior:'smooth',block:'start'})">Book your meetings</a>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="hero-scroll">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════ MAIN ═══════════════════════════════════ -->
+  <main class="main">
+
+    <!-- ── STEP 1 ── -->
+    <section class="step" id="step1">
+      <div class="step-header">
+        <span class="step-number">Step 1</span>
+        <h2>Pick your matches</h2>
+      </div>
+      <p class="step-sub">Pick a country to add all their games, add specific matches, or mix both. Remove any you don't want.</p>
+
+      <!-- Two dropdowns side by side -->
+      <div class="picker-row">
+        <div class="styled-select-wrap">
+          <select class="styled-select" id="countryDropdown" onchange="addCountry(this)">
+            <option value="">🌍 Select a country…</option>
+          </select>
+          <span class="select-arrow">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+          </span>
+        </div>
+        <div class="styled-select-wrap">
+          <select class="styled-select" id="matchDropdown" onchange="addMatch(this)">
+            <option value="">⚽ Add a specific match…</option>
+          </select>
+          <span class="select-arrow">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <!-- All selected matches as individual removable tags -->
+      <div class="tag-list" id="matchTags"></div>
+
+      <!-- Summary bar -->
+      <div class="match-controls">
+        <div class="match-count" id="matchCount">0 matches selected</div>
+        <div class="btn-group">
+          <span class="tz-badge" id="tzBadge" title="Times shown in your local timezone">🕐 <span id="tzName">local time</span></span>
+          <button class="btn-ghost" onclick="clearAll()">Clear all</button>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ── STEP 2 ── -->
+    <section class="step" id="step2">
+      <div class="step-header">
+        <span class="step-number">Step 2</span>
+        <h2>The field of your very important 'meeting'</h2>
+      </div>
+      <p class="step-sub">Your meetings will be customised to sound completely, unquestionably professional for your field.</p>
+
+      <div class="industry-select-wrap">
+        <select class="industry-select" id="industrySelect" onchange="onIndustryChange()">
+          <option value="">— What's your job? —</option>
+          <option value="finance">Finance &amp; Banking</option>
+          <option value="tech">Tech &amp; Engineering</option>
+          <option value="legal">Legal</option>
+          <option value="marketing">Marketing &amp; Advertising</option>
+          <option value="sales">Sales</option>
+          <option value="hr">HR &amp; People</option>
+          <option value="healthcare">Healthcare &amp; Medical</option>
+          <option value="consulting">Consulting</option>
+          <option value="government">Government &amp; Public Sector</option>
+          <option value="education">Education &amp; Academia</option>
+          <option value="property">Property &amp; Real Estate</option>
+          <option value="media">Media &amp; Entertainment</option>
+          <option value="other">Other</option>
+        </select>
+        <span class="select-arrow">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+        </span>
+      </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ── STEP 3 ── -->
+    <section class="step" id="step3">
+      <div class="step-header">
+        <span class="step-number">Step 3</span>
+        <h2>Add to your calendar</h2>
+      </div>
+      <p class="step-sub">Your totally legitimate meeting invites, ready to deploy.</p>
+
+      <div id="preview"></div>
+
+      <div class="export-actions" id="exportActions" style="display:none;">
+
+        <button class="cal-btn cal-btn-google" onclick="downloadICS()">
+          <div class="cal-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#fff"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#fff"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#ddd"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#fff"/></svg>
+          </div>
+          <div class="cal-label">Google Calendar<span>Download .ics, then import into Google Cal</span></div>
+        </button>
+
+        <button class="cal-btn cal-btn-ics" onclick="downloadICS()">
+          <div class="cal-icon">📅</div>
+          <div class="cal-label">Download .ics<span>Apple Calendar, Outlook &amp; more</span></div>
+        </button>
+
+      </div>
+      <p class="export-note" id="exportNote" style="display:none;">
+        ⏰ Times shown in <strong><span id="exportTzName">your local timezone</span></strong> — always worth a sanity check before match day.
+        Use the <strong>+ Google Cal</strong> link on each meeting above to add them one at a time to Google Calendar.
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Made for people who take their football very, very seriously. And their meetings slightly less so.</p>
+    <p style="margin-top:8px;">⚽ FIFA World Cup 2026™ | June 11 – July 19, 2026 | Canada · Mexico · United States</p>
+    <p style="margin-top:8px; font-size:11px;">Not affiliated with FIFA. Times approximate. Use responsibly. (You won't.)</p>
+  </footer>
+
+  <script>
+  // ═══════════════════════════════════════════════════════════════
+  // MATCH DATA — FIFA World Cup 2026™
+  // Times in UTC. Displayed in browser's local timezone.
+  // ═══════════════════════════════════════════════════════════════
+
+  const MATCHES = [
+    // ── GROUP A: Mexico, South Africa, Korea Republic, Czechia ──────────────────
+    { id:'A1', teamA:'Mexico',        flagA:'🇲🇽', teamB:'South Africa',  flagB:'🇿🇦', group:'A', kickoff:'2026-06-11T19:00:00Z', venue:'Estadio Azteca',        city:'Mexico City' },
+    { id:'A2', teamA:'Korea Republic',flagA:'🇰🇷', teamB:'Czechia',        flagB:'🇨🇿', group:'A', kickoff:'2026-06-12T02:00:00Z', venue:'Estadio Akron',         city:'Guadalajara' },
+    { id:'A3', teamA:'Mexico',        flagA:'🇲🇽', teamB:'Korea Republic', flagB:'🇰🇷', group:'A', kickoff:'2026-06-19T01:00:00Z', venue:'Estadio Akron',         city:'Guadalajara' },
+    { id:'A4', teamA:'Czechia',       flagA:'🇨🇿', teamB:'South Africa',   flagB:'🇿🇦', group:'A', kickoff:'2026-06-18T16:00:00Z', venue:'Mercedes-Benz Stadium', city:'Atlanta' },
+    { id:'A5', teamA:'Mexico',        flagA:'🇲🇽', teamB:'Czechia',        flagB:'🇨🇿', group:'A', kickoff:'2026-06-25T01:00:00Z', venue:'Estadio Azteca',        city:'Mexico City' },
+    { id:'A6', teamA:'South Africa',  flagA:'🇿🇦', teamB:'Korea Republic', flagB:'🇰🇷', group:'A', kickoff:'2026-06-25T01:00:00Z', venue:'Estadio BBVA',          city:'Monterrey' },
+
+    // ── GROUP B: Canada, Bosnia and Herzegovina, Qatar, Switzerland ─────────────
+    { id:'B1', teamA:'Canada',              flagA:'🇨🇦', teamB:'Bosnia & Herzegovina', flagB:'🇧🇦', group:'B', kickoff:'2026-06-12T19:00:00Z', venue:'BMO Field',       city:'Toronto' },
+    { id:'B2', teamA:'Qatar',               flagA:'🇶🇦', teamB:'Switzerland',          flagB:'🇨🇭', group:'B', kickoff:'2026-06-13T19:00:00Z', venue:"Levi's Stadium",  city:'San Francisco' },
+    { id:'B3', teamA:'Canada',              flagA:'🇨🇦', teamB:'Qatar',                flagB:'🇶🇦', group:'B', kickoff:'2026-06-18T22:00:00Z', venue:'BC Place',        city:'Vancouver' },
+    { id:'B4', teamA:'Switzerland',         flagA:'🇨🇭', teamB:'Bosnia & Herzegovina', flagB:'🇧🇦', group:'B', kickoff:'2026-06-18T19:00:00Z', venue:'SoFi Stadium',    city:'Los Angeles' },
+    { id:'B5', teamA:'Canada',              flagA:'🇨🇦', teamB:'Switzerland',          flagB:'🇨🇭', group:'B', kickoff:'2026-06-24T19:00:00Z', venue:'BC Place',        city:'Vancouver' },
+    { id:'B6', teamA:'Bosnia & Herzegovina',flagA:'🇧🇦', teamB:'Qatar',                flagB:'🇶🇦', group:'B', kickoff:'2026-06-24T19:00:00Z', venue:'Lumen Field',     city:'Seattle' },
+
+    // ── GROUP C: Brazil, Morocco, Haiti, Scotland ───────────────────────────────
+    { id:'C1', teamA:'Brazil',   flagA:'🇧🇷', teamB:'Morocco',  flagB:'🇲🇦', group:'C', kickoff:'2026-06-13T22:00:00Z', venue:'MetLife Stadium',        city:'New York / New Jersey' },
+    { id:'C2', teamA:'Haiti',    flagA:'🇭🇹', teamB:'Scotland', flagB:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', group:'C', kickoff:'2026-06-14T01:00:00Z', venue:'Gillette Stadium',       city:'Boston' },
+    { id:'C3', teamA:'Brazil',   flagA:'🇧🇷', teamB:'Haiti',    flagB:'🇭🇹', group:'C', kickoff:'2026-06-20T00:30:00Z', venue:'Lincoln Financial Field', city:'Philadelphia' },
+    { id:'C4', teamA:'Morocco',  flagA:'🇲🇦', teamB:'Scotland', flagB:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', group:'C', kickoff:'2026-06-19T22:00:00Z', venue:'Gillette Stadium',       city:'Boston' },
+    { id:'C5', teamA:'Brazil',   flagA:'🇧🇷', teamB:'Scotland', flagB:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', group:'C', kickoff:'2026-06-24T22:00:00Z', venue:'Hard Rock Stadium',      city:'Miami' },
+    { id:'C6', teamA:'Morocco',  flagA:'🇲🇦', teamB:'Haiti',    flagB:'🇭🇹', group:'C', kickoff:'2026-06-24T22:00:00Z', venue:'Mercedes-Benz Stadium',  city:'Atlanta' },
+
+    // ── GROUP D: USA, Paraguay, Australia, Türkiye ──────────────────────────────
+    { id:'D1', teamA:'USA',      flagA:'🇺🇸', teamB:'Paraguay', flagB:'🇵🇾', group:'D', kickoff:'2026-06-13T01:00:00Z', venue:'SoFi Stadium',    city:'Los Angeles' },
+    { id:'D2', teamA:'Australia',flagA:'🇦🇺', teamB:'Türkiye',  flagB:'🇹🇷', group:'D', kickoff:'2026-06-14T04:00:00Z', venue:'BC Place',        city:'Vancouver' },
+    { id:'D3', teamA:'USA',      flagA:'🇺🇸', teamB:'Australia',flagB:'🇦🇺', group:'D', kickoff:'2026-06-19T19:00:00Z', venue:'Lumen Field',     city:'Seattle' },
+    { id:'D4', teamA:'Paraguay', flagA:'🇵🇾', teamB:'Türkiye',  flagB:'🇹🇷', group:'D', kickoff:'2026-06-20T03:00:00Z', venue:"Levi's Stadium",  city:'San Francisco' },
+    { id:'D5', teamA:'USA',      flagA:'🇺🇸', teamB:'Türkiye',  flagB:'🇹🇷', group:'D', kickoff:'2026-06-26T02:00:00Z', venue:'SoFi Stadium',    city:'Los Angeles' },
+    { id:'D6', teamA:'Paraguay', flagA:'🇵🇾', teamB:'Australia',flagB:'🇦🇺', group:'D', kickoff:'2026-06-26T02:00:00Z', venue:"Levi's Stadium",  city:'San Francisco' },
+
+    // ── GROUP E: Germany, Côte d'Ivoire, Ecuador, Curaçao ──────────────────────
+    { id:'E1', teamA:'Germany',       flagA:'🇩🇪', teamB:"Curaçao",       flagB:'🇨🇼', group:'E', kickoff:'2026-06-14T17:00:00Z', venue:'NRG Stadium',            city:'Houston' },
+    { id:'E2', teamA:"Côte d'Ivoire", flagA:'🇨🇮', teamB:'Ecuador',       flagB:'🇪🇨', group:'E', kickoff:'2026-06-14T23:00:00Z', venue:'Lincoln Financial Field', city:'Philadelphia' },
+    { id:'E3', teamA:'Germany',       flagA:'🇩🇪', teamB:"Côte d'Ivoire", flagB:'🇨🇮', group:'E', kickoff:'2026-06-20T20:00:00Z', venue:'BMO Field',              city:'Toronto' },
+    { id:'E4', teamA:'Curaçao',       flagA:'🇨🇼', teamB:'Ecuador',       flagB:'🇪🇨', group:'E', kickoff:'2026-06-21T00:00:00Z', venue:'Arrowhead Stadium',      city:'Kansas City' },
+    { id:'E5', teamA:'Germany',       flagA:'🇩🇪', teamB:'Ecuador',       flagB:'🇪🇨', group:'E', kickoff:'2026-06-25T20:00:00Z', venue:'MetLife Stadium',        city:'New York / New Jersey' },
+    { id:'E6', teamA:'Curaçao',       flagA:'🇨🇼', teamB:"Côte d'Ivoire", flagB:'🇨🇮', group:'E', kickoff:'2026-06-25T20:00:00Z', venue:'Lincoln Financial Field', city:'Philadelphia' },
+
+    // ── GROUP F: Netherlands, Japan, Sweden, Tunisia ────────────────────────────
+    { id:'F1', teamA:'Netherlands', flagA:'🇳🇱', teamB:'Japan',   flagB:'🇯🇵', group:'F', kickoff:'2026-06-14T20:00:00Z', venue:'AT&T Stadium',  city:'Dallas' },
+    { id:'F2', teamA:'Sweden',      flagA:'🇸🇪', teamB:'Tunisia', flagB:'🇹🇳', group:'F', kickoff:'2026-06-15T02:00:00Z', venue:'Estadio BBVA',  city:'Monterrey' },
+    { id:'F3', teamA:'Netherlands', flagA:'🇳🇱', teamB:'Sweden',  flagB:'🇸🇪', group:'F', kickoff:'2026-06-20T17:00:00Z', venue:'NRG Stadium',   city:'Houston' },
+    { id:'F4', teamA:'Japan',       flagA:'🇯🇵', teamB:'Tunisia', flagB:'🇹🇳', group:'F', kickoff:'2026-06-21T04:00:00Z', venue:'Estadio BBVA',  city:'Monterrey' },
+    { id:'F5', teamA:'Netherlands', flagA:'🇳🇱', teamB:'Tunisia', flagB:'🇹🇳', group:'F', kickoff:'2026-06-25T23:00:00Z', venue:'Arrowhead Stadium', city:'Kansas City' },
+    { id:'F6', teamA:'Japan',       flagA:'🇯🇵', teamB:'Sweden',  flagB:'🇸🇪', group:'F', kickoff:'2026-06-25T23:00:00Z', venue:'AT&T Stadium',  city:'Dallas' },
+
+    // ── GROUP G: Belgium, Egypt, IR Iran, New Zealand ───────────────────────────
+    { id:'G1', teamA:'Belgium',    flagA:'🇧🇪', teamB:'Egypt',       flagB:'🇪🇬', group:'G', kickoff:'2026-06-15T19:00:00Z', venue:'Lumen Field',  city:'Seattle' },
+    { id:'G2', teamA:'IR Iran',    flagA:'🇮🇷', teamB:'New Zealand', flagB:'🇳🇿', group:'G', kickoff:'2026-06-16T01:00:00Z', venue:'SoFi Stadium', city:'Los Angeles' },
+    { id:'G3', teamA:'Belgium',    flagA:'🇧🇪', teamB:'IR Iran',     flagB:'🇮🇷', group:'G', kickoff:'2026-06-21T19:00:00Z', venue:'SoFi Stadium', city:'Los Angeles' },
+    { id:'G4', teamA:'Egypt',      flagA:'🇪🇬', teamB:'New Zealand', flagB:'🇳🇿', group:'G', kickoff:'2026-06-22T01:00:00Z', venue:'BC Place',     city:'Vancouver' },
+    { id:'G5', teamA:'Belgium',    flagA:'🇧🇪', teamB:'New Zealand', flagB:'🇳🇿', group:'G', kickoff:'2026-06-27T03:00:00Z', venue:'BC Place',     city:'Vancouver' },
+    { id:'G6', teamA:'Egypt',      flagA:'🇪🇬', teamB:'IR Iran',     flagB:'🇮🇷', group:'G', kickoff:'2026-06-27T03:00:00Z', venue:'Lumen Field',  city:'Seattle' },
+
+    // ── GROUP H: Spain, Cabo Verde, Saudi Arabia, Uruguay ──────────────────────
+    { id:'H1', teamA:'Spain',        flagA:'🇪🇸', teamB:'Cabo Verde',  flagB:'🇨🇻', group:'H', kickoff:'2026-06-15T16:00:00Z', venue:'Mercedes-Benz Stadium', city:'Atlanta' },
+    { id:'H2', teamA:'Saudi Arabia', flagA:'🇸🇦', teamB:'Uruguay',     flagB:'🇺🇾', group:'H', kickoff:'2026-06-15T22:00:00Z', venue:'Hard Rock Stadium',     city:'Miami' },
+    { id:'H3', teamA:'Spain',        flagA:'🇪🇸', teamB:'Saudi Arabia',flagB:'🇸🇦', group:'H', kickoff:'2026-06-21T16:00:00Z', venue:'Mercedes-Benz Stadium', city:'Atlanta' },
+    { id:'H4', teamA:'Cabo Verde',   flagA:'🇨🇻', teamB:'Uruguay',     flagB:'🇺🇾', group:'H', kickoff:'2026-06-21T22:00:00Z', venue:'Hard Rock Stadium',     city:'Miami' },
+    { id:'H5', teamA:'Spain',        flagA:'🇪🇸', teamB:'Uruguay',     flagB:'🇺🇾', group:'H', kickoff:'2026-06-27T00:00:00Z', venue:'Estadio Akron',         city:'Guadalajara' },
+    { id:'H6', teamA:'Cabo Verde',   flagA:'🇨🇻', teamB:'Saudi Arabia',flagB:'🇸🇦', group:'H', kickoff:'2026-06-27T00:00:00Z', venue:'NRG Stadium',           city:'Houston' },
+
+    // ── GROUP I: France, Senegal, Iraq, Norway ──────────────────────────────────
+    { id:'I1', teamA:'France',  flagA:'🇫🇷', teamB:'Senegal', flagB:'🇸🇳', group:'I', kickoff:'2026-06-16T19:00:00Z', venue:'MetLife Stadium',        city:'New York / New Jersey' },
+    { id:'I2', teamA:'Iraq',    flagA:'🇮🇶', teamB:'Norway',  flagB:'🇳🇴', group:'I', kickoff:'2026-06-16T22:00:00Z', venue:'Gillette Stadium',       city:'Boston' },
+    { id:'I3', teamA:'France',  flagA:'🇫🇷', teamB:'Iraq',    flagB:'🇮🇶', group:'I', kickoff:'2026-06-22T21:00:00Z', venue:'Lincoln Financial Field', city:'Philadelphia' },
+    { id:'I4', teamA:'Senegal', flagA:'🇸🇳', teamB:'Norway',  flagB:'🇳🇴', group:'I', kickoff:'2026-06-23T00:00:00Z', venue:'MetLife Stadium',        city:'New York / New Jersey' },
+    { id:'I5', teamA:'France',  flagA:'🇫🇷', teamB:'Norway',  flagB:'🇳🇴', group:'I', kickoff:'2026-06-26T19:00:00Z', venue:'Gillette Stadium',       city:'Boston' },
+    { id:'I6', teamA:'Senegal', flagA:'🇸🇳', teamB:'Iraq',    flagB:'🇮🇶', group:'I', kickoff:'2026-06-26T19:00:00Z', venue:'BMO Field',              city:'Toronto' },
+
+    // ── GROUP J: Argentina, Algeria, Austria, Jordan ────────────────────────────
+    { id:'J1', teamA:'Argentina', flagA:'🇦🇷', teamB:'Algeria', flagB:'🇩🇿', group:'J', kickoff:'2026-06-17T01:00:00Z', venue:'Arrowhead Stadium', city:'Kansas City' },
+    { id:'J2', teamA:'Austria',   flagA:'🇦🇹', teamB:'Jordan',  flagB:'🇯🇴', group:'J', kickoff:'2026-06-17T04:00:00Z', venue:"Levi's Stadium",    city:'San Francisco' },
+    { id:'J3', teamA:'Argentina', flagA:'🇦🇷', teamB:'Austria', flagB:'🇦🇹', group:'J', kickoff:'2026-06-22T17:00:00Z', venue:'AT&T Stadium',      city:'Dallas' },
+    { id:'J4', teamA:'Algeria',   flagA:'🇩🇿', teamB:'Jordan',  flagB:'🇯🇴', group:'J', kickoff:'2026-06-23T03:00:00Z', venue:"Levi's Stadium",    city:'San Francisco' },
+    { id:'J5', teamA:'Argentina', flagA:'🇦🇷', teamB:'Jordan',  flagB:'🇯🇴', group:'J', kickoff:'2026-06-28T02:00:00Z', venue:'AT&T Stadium',      city:'Dallas' },
+    { id:'J6', teamA:'Algeria',   flagA:'🇩🇿', teamB:'Austria', flagB:'🇦🇹', group:'J', kickoff:'2026-06-28T02:00:00Z', venue:'Arrowhead Stadium', city:'Kansas City' },
+
+    // ── GROUP K: Portugal, DR Congo, Uzbekistan, Colombia ──────────────────────
+    { id:'K1', teamA:'Portugal',   flagA:'🇵🇹', teamB:'DR Congo',   flagB:'🇨🇩', group:'K', kickoff:'2026-06-17T17:00:00Z', venue:'NRG Stadium',           city:'Houston' },
+    { id:'K2', teamA:'Uzbekistan', flagA:'🇺🇿', teamB:'Colombia',   flagB:'🇨🇴', group:'K', kickoff:'2026-06-18T02:00:00Z', venue:'Estadio Azteca',        city:'Mexico City' },
+    { id:'K3', teamA:'Portugal',   flagA:'🇵🇹', teamB:'Uzbekistan', flagB:'🇺🇿', group:'K', kickoff:'2026-06-23T17:00:00Z', venue:'NRG Stadium',           city:'Houston' },
+    { id:'K4', teamA:'DR Congo',   flagA:'🇨🇩', teamB:'Colombia',   flagB:'🇨🇴', group:'K', kickoff:'2026-06-24T02:00:00Z', venue:'Estadio Akron',         city:'Guadalajara' },
+    { id:'K5', teamA:'Portugal',   flagA:'🇵🇹', teamB:'Colombia',   flagB:'🇨🇴', group:'K', kickoff:'2026-06-27T23:30:00Z', venue:'Hard Rock Stadium',     city:'Miami' },
+    { id:'K6', teamA:'DR Congo',   flagA:'🇨🇩', teamB:'Uzbekistan', flagB:'🇺🇿', group:'K', kickoff:'2026-06-27T23:30:00Z', venue:'Mercedes-Benz Stadium', city:'Atlanta' },
+
+    // ── GROUP L: England, Croatia, Ghana, Panama ────────────────────────────────
+    { id:'L1', teamA:'England', flagA:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', teamB:'Croatia', flagB:'🇭🇷', group:'L', kickoff:'2026-06-17T20:00:00Z', venue:'AT&T Stadium',     city:'Dallas' },
+    { id:'L2', teamA:'Ghana',   flagA:'🇬🇭', teamB:'Panama',  flagB:'🇵🇦', group:'L', kickoff:'2026-06-17T23:00:00Z', venue:'BMO Field',         city:'Toronto' },
+    { id:'L3', teamA:'England', flagA:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', teamB:'Ghana',   flagB:'🇬🇭', group:'L', kickoff:'2026-06-23T20:00:00Z', venue:'Gillette Stadium',  city:'Boston' },
+    { id:'L4', teamA:'Panama',  flagA:'🇵🇦', teamB:'Croatia', flagB:'🇭🇷', group:'L', kickoff:'2026-06-23T23:00:00Z', venue:'BMO Field',         city:'Toronto' },
+    { id:'L5', teamA:'England', flagA:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', teamB:'Panama',  flagB:'🇵🇦', group:'L', kickoff:'2026-06-27T21:00:00Z', venue:'MetLife Stadium',   city:'New York / New Jersey' },
+    { id:'L6', teamA:'Croatia', flagA:'🇭🇷', teamB:'Ghana',   flagB:'🇬🇭', group:'L', kickoff:'2026-06-27T21:00:00Z', venue:'Lincoln Financial Field', city:'Philadelphia' },
+
+    // ── KNOCKOUT STAGE — ROUND OF 32 ────────────────────────────────────────────
+    { id:'R32_1',  teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-06-28T19:00:00Z', venue:'SoFi Stadium',          city:'Los Angeles',           knockout:true },
+    { id:'R32_2',  teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-06-29T17:00:00Z', venue:'NRG Stadium',           city:'Houston',               knockout:true },
+    { id:'R32_3',  teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-06-29T20:30:00Z', venue:'Gillette Stadium',      city:'Boston',                knockout:true },
+    { id:'R32_4',  teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-06-30T01:00:00Z', venue:'Estadio BBVA',          city:'Monterrey',             knockout:true },
+    { id:'R32_5',  teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-06-30T17:00:00Z', venue:'AT&T Stadium',          city:'Dallas',                knockout:true },
+    { id:'R32_6',  teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-06-30T21:00:00Z', venue:'MetLife Stadium',       city:'New York / New Jersey', knockout:true },
+    { id:'R32_7',  teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-07-01T01:00:00Z', venue:'Estadio Azteca',        city:'Mexico City',           knockout:true },
+    { id:'R32_8',  teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-07-01T16:00:00Z', venue:'Mercedes-Benz Stadium', city:'Atlanta',               knockout:true },
+    { id:'R32_9',  teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-07-01T20:00:00Z', venue:'Lumen Field',           city:'Seattle',               knockout:true },
+    { id:'R32_10', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-07-02T00:00:00Z', venue:"Levi's Stadium",        city:'San Francisco',         knockout:true },
+    { id:'R32_11', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-07-02T19:00:00Z', venue:'SoFi Stadium',          city:'Los Angeles',           knockout:true },
+    { id:'R32_12', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-07-02T23:00:00Z', venue:'BMO Field',             city:'Toronto',               knockout:true },
+    { id:'R32_13', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-07-03T03:00:00Z', venue:'BC Place',              city:'Vancouver',             knockout:true },
+    { id:'R32_14', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-07-03T18:00:00Z', venue:'AT&T Stadium',          city:'Dallas',                knockout:true },
+    { id:'R32_15', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-07-03T22:00:00Z', venue:'Hard Rock Stadium',     city:'Miami',                 knockout:true },
+    { id:'R32_16', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R32', kickoff:'2026-07-04T01:30:00Z', venue:'Arrowhead Stadium',     city:'Kansas City',           knockout:true },
+
+    // ── KNOCKOUT STAGE — ROUND OF 16 ─────────────────────────────────────────────
+    { id:'R16_1', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R16', kickoff:'2026-07-04T17:00:00Z', venue:'NRG Stadium',           city:'Houston',               knockout:true },
+    { id:'R16_2', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R16', kickoff:'2026-07-04T21:00:00Z', venue:'Lincoln Financial Field',city:'Philadelphia',          knockout:true },
+    { id:'R16_3', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R16', kickoff:'2026-07-05T20:00:00Z', venue:'MetLife Stadium',       city:'New York / New Jersey', knockout:true },
+    { id:'R16_4', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R16', kickoff:'2026-07-06T00:00:00Z', venue:'Estadio Azteca',        city:'Mexico City',           knockout:true },
+    { id:'R16_5', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R16', kickoff:'2026-07-06T19:00:00Z', venue:'AT&T Stadium',          city:'Dallas',                knockout:true },
+    { id:'R16_6', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R16', kickoff:'2026-07-07T00:00:00Z', venue:'Lumen Field',           city:'Seattle',               knockout:true },
+    { id:'R16_7', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R16', kickoff:'2026-07-07T16:00:00Z', venue:'Mercedes-Benz Stadium', city:'Atlanta',               knockout:true },
+    { id:'R16_8', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'R16', kickoff:'2026-07-07T20:00:00Z', venue:'BC Place',              city:'Vancouver',             knockout:true },
+
+    // ── QUARTERFINALS ─────────────────────────────────────────────────────────────
+    { id:'QF1', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'QF', kickoff:'2026-07-09T20:00:00Z', venue:'Gillette Stadium',  city:'Boston',      knockout:true },
+    { id:'QF2', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'QF', kickoff:'2026-07-10T19:00:00Z', venue:'SoFi Stadium',      city:'Los Angeles', knockout:true },
+    { id:'QF3', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'QF', kickoff:'2026-07-11T21:00:00Z', venue:'Hard Rock Stadium', city:'Miami',       knockout:true },
+    { id:'QF4', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'QF', kickoff:'2026-07-12T01:00:00Z', venue:'Arrowhead Stadium', city:'Kansas City', knockout:true },
+
+    // ── SEMI-FINALS ───────────────────────────────────────────────────────────────
+    { id:'SF1', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'SF', kickoff:'2026-07-14T19:00:00Z', venue:'AT&T Stadium',          city:'Dallas',               knockout:true },
+    { id:'SF2', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'SF', kickoff:'2026-07-15T19:00:00Z', venue:'Mercedes-Benz Stadium', city:'Atlanta',              knockout:true },
+
+    // ── THIRD PLACE ───────────────────────────────────────────────────────────────
+    { id:'3P',  teamA:'TBD', flagA:'🥉', teamB:'TBD', flagB:'🥉', group:'3P',  kickoff:'2026-07-18T21:00:00Z', venue:'Hard Rock Stadium', city:'Miami',                knockout:true },
+
+    // ── THE FINAL ─────────────────────────────────────────────────────────────────
+    { id:'FIN', teamA:'TBD', flagA:'🏆', teamB:'TBD', flagB:'🏆', group:'FIN', kickoff:'2026-07-19T19:00:00Z', venue:'MetLife Stadium',   city:'New York / New Jersey', knockout:true },
+  ];
+
+  // ═══════════════════════════════════════════════════════════════
+  // INDUSTRY MEETING NAME TEMPLATES
+  // ═══════════════════════════════════════════════════════════════
+
+  const PERSON_NAMES = ['Henderson', 'Crawford', 'Whitfield', 'Pemberton', 'Stratton',
+    'Blackwell', 'Ashford', 'Mercer', 'Hartley', 'Kingswood', 'Alderton', 'Bramwell',
+    'Collingwood', 'Forsythe', 'Haverstock', 'Illingworth', 'Jarvis', 'Kingsley',
+    'Latimer', 'Northcott', 'Ogilvy', 'Prescott', 'Redmond', 'Sinclair', 'Thornton'];
+
+  const COMPANY_NAMES = ['Meridian Group', 'Apex Partners', 'Stratton Global', 'Henderson Capital',
+    'Blackwell & Associates', 'Kingswood Advisory', 'Ogilvy Consulting', 'Prescott Holdings',
+    'Thornton International', 'Redmond & Partners', 'Sinclair Group', 'Latimer Capital',
+    'Northcott Ventures', 'Collingwood Advisors', 'Forsythe Corporation'];
+
+  const ROOM_NAMES = ['Board Room B', 'Level 12 – East Wing', 'Conf. Room 4A', 'Executive Suite',
+    'Level 8 – South', 'The War Room', 'Innovation Hub', 'Conf. Room G14', 'Partners Lounge',
+    'Virtual (Teams)', 'Virtual (Zoom)', 'Off-site (TBC)'];
+
+  // Subtle corporate-geography descriptors per team — the nod to the match
+  const TEAM_REGION = {
+    'Argentina':      'Southern Cone',
+    'Australia':      'Pacific Rim',
+    'Belgium':        'Benelux',
+    'Bolivia':        'Andean',
+    'Brazil':         'South American',
+    'Cameroon':       'West African',
+    'Canada':         'North American',
+    'Chile':          'Andean',
+    'Colombia':       'Andean',
+    'Costa Rica':     'Central American',
+    'Croatia':        'Adriatic',
+    'Czech Republic': 'Central European',
+    'Denmark':        'Nordic',
+    'Ecuador':        'Andean',
+    'Egypt':          'North African',
+    'England':        'British Isles',
+    'France':         'Western European',
+    'Germany':        'DACH',
+    'Ghana':          'West African',
+    'Greece':         'Mediterranean',
+    'Honduras':       'Central American',
+    'Hungary':        'Central European',
+    'Indonesia':      'Southeast Asian',
+    'Iran':           'Persian Gulf',
+    'Israel':         'Eastern Mediterranean',
+    'Italy':          'Mediterranean',
+    'Japan':          'Asia Pacific',
+    'Kenya':          'East African',
+    'Mexico':         'North American',
+    'Morocco':        'North African',
+    'Netherlands':    'Benelux',
+    'New Zealand':    'ANZ',
+    'Nigeria':        'West African',
+    'Norway':         'Nordic',
+    'Panama':         'Central American',
+    'Paraguay':       'South American',
+    'Peru':           'Andean',
+    'Poland':         'Central European',
+    'Portugal':       'Iberian',
+    'Romania':        'Eastern European',
+    'Saudi Arabia':   'Gulf',
+    'Scotland':       'British Isles',
+    'Senegal':        'West African',
+    'Serbia':         'Balkan',
+    'Slovenia':       'Alpine',
+    'South Korea':    'Asia Pacific',
+    'Spain':          'Iberian',
+    'Switzerland':    'Alpine',
+    'Türkiye':        'Trans-Regional',
+    'Ukraine':        'Eastern European',
+    'Uruguay':        'Southern Cone',
+    'USA':            'North American',
+    'Venezuela':      'Caribbean',
+    'Wales':          'British Isles',
+    "Côte d'Ivoire":  'West African',
+  };
+
+  const INDUSTRIES = {
+    finance: {
+      label: 'Finance & Banking',
+      templates: [
+        '{N}–{C} Investment Review',
+        '{N} & {C} Markets Briefing',
+        'Cross-Border Capital: {N} & {C}',
+        '{N}–{C} Portfolio Strategy Session',
+        'Due Diligence: {N} & {C} Exposure',
+        '{N}–{C} Risk Framework Review',
+        'Q{Q} Revenue Alignment — {N} & {C}',
+        'Bilateral Finance Meeting: {N}–{C}',
+        '{N} & {C} Regulatory Compliance Briefing',
+        'Investor Relations: {N}–{C} Markets',
+      ],
+      descriptions: [
+        'Please review the relevant documentation prior to attendance. This is a confidential meeting.',
+        'Attendance mandatory. Dial-in details to follow.',
+        'Bring Q{Q} figures. Do not share externally.',
+        'NDA required. Block one hour in your calendar.',
+        'Stakeholder meeting. Agenda attached.',
+      ],
+    },
+    tech: {
+      label: 'Tech & Engineering',
+      templates: [
+        '{N}–{C} Platform Integration Review',
+        'Technical Discovery: {N} & {C} Systems',
+        '{N} & {C} Engineering Sync',
+        'Architecture Review: {N}–{C} Stack',
+        'API Partnership Workshop — {N} & {C}',
+        '{N}–{C} Security Posture Review',
+        'DevOps Alignment: {N} & {C} Migration',
+        'Q{Q} Roadmap: {N}–{C} Engineering',
+        '{N} & {C} Infrastructure Deep Dive',
+        'Incident Review — {N}–{C} Dependency',
+      ],
+      descriptions: [
+        'Bring your laptop. Screen-sharing required.',
+        'Pre-read: architecture doc in Notion.',
+        'Attendance mandatory. Retro items due beforehand.',
+        'Mute on entry. Video preferred.',
+        'Blocked. Do not reschedule without Slack message.',
+      ],
+    },
+    legal: {
+      label: 'Legal',
+      templates: [
+        'Matter Review: {N} v. {C}',
+        '{N}–{C} Compliance Advisory',
+        'Cross-Jurisdictional Brief: {N} & {C}',
+        'Contract Negotiation: {N}–{C} Terms',
+        '{N} & {C} Regulatory Filing Review',
+        'Dispute Resolution: {N} v. {C}',
+        'External Counsel Sync: {N} & {C}',
+        '{N}–{C} Due Diligence',
+        'Bilateral Legal Review — {N} & {C}',
+        'Settlement Discussion: {N}–{C} Matter',
+      ],
+      descriptions: [
+        'Privileged and confidential. Attorney–client communication.',
+        'Do not forward this invitation.',
+        'Confidential matter. No recording permitted.',
+        'Solicitor-client privilege applies.',
+        'All correspondence to be marked CONFIDENTIAL.',
+      ],
+    },
+    marketing: {
+      label: 'Marketing & Advertising',
+      templates: [
+        '{N}–{C} Campaign Strategy',
+        'Brand Alignment: {N} & {C} Markets',
+        '{N} & {C} Go-To-Market Planning',
+        'Creative Brief: {N}–{C} Launch',
+        'Digital Performance Review — {N} & {C}',
+        '{N}–{C} Content Strategy Workshop',
+        'Audience Insights: {N} & {C}',
+        'Campaign Planning — {N}–{C} Region',
+        '{N} & {C} Partnership Pitch',
+        'Q{Q} Marketing Review: {N}–{C}',
+      ],
+      descriptions: [
+        'Please review the brief before the session.',
+        'Creative assets to be shared on the day.',
+        'Attendance required. Agenda to follow.',
+        'No phones during ideation phase.',
+        'Bring your ideas. Headspace required.',
+      ],
+    },
+    sales: {
+      label: 'Sales',
+      templates: [
+        '{N}–{C} Business Development Meeting',
+        'New Markets Review: {N} & {C}',
+        '{N} & {C} Commercial Partnership',
+        'QBR — {N}–{C} Key Accounts',
+        'Discovery Call: {N} & {C} Opportunity',
+        '{N}–{C} Proposal Walk-Through',
+        'Pipeline Sync: {N} & {C} Region',
+        'Closing Discussion — {N}–{C}',
+        '{N} & {C} Onboarding Review',
+        'New Client Briefing: {N}–{C}',
+      ],
+      descriptions: [
+        'CLIENT FACING. Suit up.',
+        'Key account. Attendance mandatory.',
+        'Bring the deck. Reviewed and signed off.',
+        'Do not reschedule. This was hard to get.',
+        'New client. First impression. No excuses.',
+      ],
+    },
+    hr: {
+      label: 'HR & People',
+      templates: [
+        '{N}–{C} Global Mobility Review',
+        'Talent Strategy: {N} & {C} Markets',
+        '{N} & {C} People & Culture Sync',
+        'Workforce Planning — {N}–{C}',
+        '{N}–{C} Compensation Benchmarking',
+        'HR Leadership: {N} & {C} Alignment',
+        'Org Design Workshop: {N}–{C}',
+        '{N} & {C} Succession Planning',
+        'L&D Strategy — {N}–{C} Teams',
+        'Performance Review: {N} & {C} Function',
+      ],
+      descriptions: [
+        'Strictly confidential. Personnel matters.',
+        'Do not share calendar details externally.',
+        'Bring HRIS data. Meeting to run to time.',
+        'Panel discussion — all members required.',
+        'Sensitive discussion. Book a private room.',
+      ],
+    },
+    healthcare: {
+      label: 'Healthcare & Medical',
+      templates: [
+        '{N}–{C} Clinical Research Collaboration',
+        'International Health Forum: {N} & {C}',
+        '{N} & {C} Regulatory Submission Review',
+        'Cross-Border Clinical Trial: {N}–{C}',
+        '{N}–{C} Medical Affairs Briefing',
+        'Joint Research Committee — {N} & {C}',
+        '{N} & {C} Outcomes Data Review',
+        'Global Health Initiative: {N}–{C}',
+        '{N}–{C} Formulary Alignment',
+        'Adverse Event Review: {N} & {C} Protocol',
+      ],
+      descriptions: [
+        'Clinical meeting. Quorum required.',
+        'Attendance mandatory. No phone calls during.',
+        'Refer to patient notes beforehand.',
+        'Confidential clinical content.',
+        'Peer review in progress. Do not disturb.',
+      ],
+    },
+    consulting: {
+      label: 'Consulting',
+      templates: [
+        '{N}–{C} Engagement Kickoff',
+        'Stakeholder Workshop: {N} & {C}',
+        '{N} & {C} Strategy Alignment',
+        'Discovery Session — {N}–{C} Programme',
+        'Executive Briefing: {N} & {C} Steering',
+        '{N}–{C} Transformation Review',
+        'PMO Update: {N} & {C} Account',
+        'Change Management: {N}–{C}',
+        '{N} & {C} Final Readout',
+        'Phase {Q} Review — {N}–{C}',
+      ],
+      descriptions: [
+        'Client-facing. Deck to be rehearsed beforehand.',
+        'Key deliverable session. No rescheduling.',
+        'Steering committee. All members required.',
+        'Bring the SOW. Scope discussion expected.',
+        'Billable time. Attendance is non-negotiable.',
+      ],
+    },
+    government: {
+      label: 'Government & Public Sector',
+      templates: [
+        '{N}–{C} Bilateral Meeting',
+        'Ministerial Briefing: {N} & {C}',
+        '{N} & {C} Policy Alignment',
+        'Inter-Agency Coordination: {N}–{C}',
+        '{N}–{C} Diplomatic Relations Review',
+        'Policy Forum: {N} & {C} Priorities',
+        '{N} & {C} Legislative Brief',
+        'Cross-Portfolio Sync: {N}–{C}',
+        '{N}–{C} Stakeholder Consultation',
+        'Government Relations: {N} & {C}',
+      ],
+      descriptions: [
+        'Official government business. Attendance mandatory.',
+        'For official use only.',
+        'Sensitive matter. Not for distribution.',
+        'Please clear your diary. Senior attendance required.',
+        'Parliamentary schedule does not move. Neither does this.',
+      ],
+    },
+    education: {
+      label: 'Education & Academia',
+      templates: [
+        '{N}–{C} Academic Exchange Program',
+        'Research Collaboration: {N} & {C}',
+        '{N} & {C} Faculty Partnership Review',
+        'International Academic Forum: {N}–{C}',
+        '{N}–{C} Curriculum Development Session',
+        'Joint Research Initiative — {N} & {C}',
+        '{N} & {C} Student Exchange Planning',
+        'Grant Review: {N}–{C} Proposal',
+        '{N}–{C} Accreditation Briefing',
+        'Academic Standards: {N} & {C}',
+      ],
+      descriptions: [
+        'All faculty members required. Apologies to be submitted.',
+        'Marking moratorium in effect.',
+        'Academic calendar blocked. Do not conflict.',
+        'Bring teaching portfolios. Agenda circulated.',
+        'Research governance. Attendance logged.',
+      ],
+    },
+    property: {
+      label: 'Property & Real Estate',
+      templates: [
+        '{N}–{C} Cross-Border Investment Review',
+        'Property Partnership: {N} & {C}',
+        '{N} & {C} Market Appraisal',
+        'Due Diligence: {N}–{C} Portfolio',
+        '{N}–{C} Development Opportunity Briefing',
+        'Vendor Negotiation: {N} & {C} Assets',
+        '{N} & {C} Lease Negotiation',
+        'Site Acquisition Review — {N}–{C}',
+        '{N}–{C} Valuation Briefing',
+        'Real Estate Forum: {N} & {C}',
+      ],
+      descriptions: [
+        'Off-site inspection. Wear appropriate footwear.',
+        'Contract under review. Solicitor to attend.',
+        'Do not forward. Confidential commercial terms.',
+        'Settlement is time-sensitive. Block all afternoon.',
+        'Vendor meeting. Negotiation face in.',
+      ],
+    },
+    media: {
+      label: 'Media & Entertainment',
+      templates: [
+        '{N}–{C} Content Partnership Review',
+        'Distribution Strategy: {N} & {C}',
+        '{N} & {C} Production Partnership',
+        'Rights Negotiation: {N}–{C}',
+        '{N}–{C} Co-Production Briefing',
+        'Broadcast Planning: {N} & {C} Markets',
+        '{N} & {C} Audience Research Review',
+        'Creative Development: {N}–{C} Format',
+        '{N}–{C} Commissioning Review',
+        'Media Rights: {N} & {C} Deal',
+      ],
+      descriptions: [
+        'On-set protocol applies.',
+        'Talent management present. Keep brief.',
+        'Commissioning window closes soon. Must attend.',
+        'NDA in place. No social media.',
+        'Production schedule is tight. No delays.',
+      ],
+    },
+    other: {
+      label: 'Other',
+      templates: [
+        'Internal Alignment',
+        'Working Session',
+        'Team Briefing',
+        'Planning Sync',
+        'Catch-Up — Do Not Move',
+        'Review Session',
+        'Focus Time — Do Not Disturb',
+        'Stakeholder Meeting',
+        'Team Check-In',
+        'Blocked — Important',
+        'Project Update',
+        'Standing Meeting',
+      ],
+      descriptions: [
+        'Please attend. Do not reschedule.',
+        'Important. Block this time.',
+        'Required attendance. Details to follow.',
+        'Do not move. This has been in the diary for weeks.',
+        'Attendance expected. Come prepared.',
+      ],
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // STATE
+  // ═══════════════════════════════════════════════════════════════
+
+  const selectedMatches = new Set();
+  let selectedIndustry = '';
+  const customTitles = new Map();
+
+  // ═══════════════════════════════════════════════════════════════
+  // SEEDED RANDOM (deterministic per match)
+  // ═══════════════════════════════════════════════════════════════
+
+  function seededRand(seed, max) {
+    // Simple hash
+    let h = 0;
+    for (let i = 0; i < seed.length; i++) {
+      h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
+    }
+    return Math.abs(h) % max;
+  }
+
+  function pick(arr, seed, offset = 0) {
+    return arr[seededRand(seed + String(offset), arr.length)];
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // MEETING NAME / DESCRIPTION GENERATION
+  // ═══════════════════════════════════════════════════════════════
+
+  function getMeetingName(match, industry) {
+    if (!industry || !INDUSTRIES[industry]) return 'Important Meeting (Do Not Cancel)';
+    const { templates } = INDUSTRIES[industry];
+    const template = pick(templates, match.id, 0);
+    const q = new Date(match.kickoff).getUTCMonth() < 6 ? '2' : '3';
+
+    return template
+      .replace('{N}',  match.teamA)
+      .replace('{N2}', match.teamB)
+      .replace('{C}',  match.teamB)
+      .replace('{C2}', match.teamA)
+      .replace('{Q}',  q);
+  }
+
+  function getMeetingDescription(match, industry) {
+    if (!industry || !INDUSTRIES[industry]) return 'Please attend. Do not reschedule.';
+    const { descriptions } = INDUSTRIES[industry];
+    const desc = pick(descriptions, match.id + 'desc', 0);
+    const d = new Date(match.kickoff);
+    const q = d.getUTCMonth() < 6 ? '2' : '3';
+    return desc.replace('{Q}', q);
+  }
+
+  function getMeetingLocation(match) {
+    return pick(ROOM_NAMES, match.id + 'room', 0);
+  }
+
+  // Returns custom title if the user edited it, otherwise the generated one
+  function getEffectiveMeetingName(match, industry) {
+    if (customTitles.has(match.id)) return customTitles.get(match.id) || getMeetingName(match, industry);
+    return getMeetingName(match, industry);
+  }
+
+  function onTitleEdit(el) {
+    customTitles.set(el.dataset.matchId, el.textContent);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // TIME FORMATTING
+  // ═══════════════════════════════════════════════════════════════
+
+  function formatLocalDateTime(utcStr) {
+    const d = new Date(utcStr);
+    const datePart = d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+    const timePart = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    return `${datePart}, ${timePart}`;
+  }
+
+  function formatLocalTime(utcStr) {
+    const d = new Date(utcStr);
+    return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function formatLocalDate(utcStr) {
+    const d = new Date(utcStr);
+    return d.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function formatShortDate(utcStr) {
+    const d = new Date(utcStr);
+    return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+
+  function icsDate(utcStr) {
+    return new Date(utcStr).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  }
+
+  function addHours(utcStr, hours) {
+    return new Date(new Date(utcStr).getTime() + hours * 3600000).toISOString();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // BUILD TEAM → MATCH LOOKUP
+  // ═══════════════════════════════════════════════════════════════
+
+  const teamToMatches = {};
+
+  MATCHES.filter(m => !m.knockout).forEach(m => {
+    [m.teamA, m.teamB].forEach(t => {
+      if (!teamToMatches[t]) teamToMatches[t] = [];
+      teamToMatches[t].push(m.id);
+    });
+  });
+
+  const allTeams = Object.keys(teamToMatches).sort();
+
+  // team → flag lookup
+  const teamFlag = {};
+  MATCHES.filter(m => !m.knockout).forEach(m => {
+    teamFlag[m.teamA] = m.flagA;
+    teamFlag[m.teamB] = m.flagB;
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  // GROUP LABELS
+  // ═══════════════════════════════════════════════════════════════
+
+  const GROUP_LABELS = {
+    A:'Group A', B:'Group B', C:'Group C', D:'Group D', E:'Group E', F:'Group F',
+    G:'Group G', H:'Group H', I:'Group I', J:'Group J', K:'Group K', L:'Group L',
+    R32:'Round of 32', R16:'Round of 16', QF:'Quarterfinals', SF:'Semi-finals',
+    '3P':'Third Place', FIN:'The Final ⭐',
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // COUNTRY DROPDOWN
+  // ═══════════════════════════════════════════════════════════════
+
+  function buildCountryDropdown() {
+    const sel = document.getElementById('countryDropdown');
+    sel.innerHTML = '<option value="">🌍 Select a country…</option>' +
+      allTeams.map(t => `<option value="${t}">${teamFlag[t]} ${t}</option>`).join('');
+  }
+
+  function addCountry(select) {
+    const country = select.value;
+    select.value = '';
+    if (!country) return;
+    // Add all of this country's matches as individual selections
+    (teamToMatches[country] || []).forEach(id => selectedMatches.add(id));
+    renderMatchTags();
+    buildMatchDropdown();
+    updateMatchCount();
+    renderPreview();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // MATCH DROPDOWN
+  // ═══════════════════════════════════════════════════════════════
+
+  function buildMatchDropdown() {
+    const sel = document.getElementById('matchDropdown');
+    sel.innerHTML = '<option value="">⚽ Add a specific match…</option>';
+
+    const byDate = {};
+    MATCHES.forEach(m => {
+      if (selectedMatches.has(m.id)) return;
+      const label = formatLocalDate(m.kickoff);
+      if (!byDate[label]) byDate[label] = [];
+      byDate[label].push(m);
+    });
+
+    Object.entries(byDate).forEach(([date, matches]) => {
+      const grp = document.createElement('optgroup');
+      grp.label = date;
+      matches.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        const stage = GROUP_LABELS[m.group] || m.group;
+        opt.textContent = `${m.flagA} ${m.teamA} vs ${m.teamB} ${m.flagB}  ·  ${stage}  ·  ${formatLocalTime(m.kickoff)}`;
+        grp.appendChild(opt);
+      });
+      sel.appendChild(grp);
+    });
+  }
+
+  function addMatch(select) {
+    const id = select.value;
+    select.value = '';
+    if (!id || selectedMatches.has(id)) return;
+    selectedMatches.add(id);
+    renderMatchTags();
+    buildMatchDropdown();
+    updateMatchCount();
+    renderPreview();
+  }
+
+  function removeMatch(id) {
+    selectedMatches.delete(id);
+    renderMatchTags();
+    buildMatchDropdown();
+    updateMatchCount();
+    renderPreview();
+  }
+
+  function renderMatchTags() {
+    const container = document.getElementById('matchTags');
+    const selected = MATCHES.filter(m => selectedMatches.has(m.id))
+      .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
+    container.innerHTML = selected.map(m => {
+      const stage = GROUP_LABELS[m.group] || m.group;
+      return `<div class="selection-tag">
+        <span>${m.flagA} ${m.teamA} <span style="opacity:0.5;font-weight:400;font-size:11px">vs</span> ${m.teamB} ${m.flagB}</span>
+        <span class="tag-meta">${formatShortDate(m.kickoff)} · ${formatLocalTime(m.kickoff)} · ${stage}</span>
+        <button class="tag-remove" onclick="removeMatch('${m.id}')" aria-label="Remove">×</button>
+      </div>`;
+    }).join('');
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // SHARED CONTROLS
+  // ═══════════════════════════════════════════════════════════════
+
+  // ═══════════════════════════════════════════════════════════════
+  // GLOBAL MEETINGS COUNTER (CountAPI — persists across all users)
+  // ═══════════════════════════════════════════════════════════════
+
+  const _COUNT_NS  = 'ivegotameetingwithfootball';
+  const _COUNT_KEY = 'total-meetings-set';
+  const _COUNT_BASE = 'https://api.counterapi.dev/v1';
+
+  // Display the latest global count in the hero top bar
+  function setHeroGlobalCount(n) {
+    const el = document.getElementById('heroMatchCount');
+    if (!el) return;
+    el.textContent = `${Number(n).toLocaleString()} Meetings Set`;
+  }
+
+  // Fetch current global total and show it
+  async function fetchGlobalCount() {
+    try {
+      const res  = await fetch(`${_COUNT_BASE}/${_COUNT_NS}/${_COUNT_KEY}`);
+      const data = await res.json();
+      if (data.count != null) setHeroGlobalCount(data.count);
+    } catch (_) { /* fail silently */ }
+  }
+
+  // Increment global total by n (one API call per meeting, run in parallel),
+  // then refresh the display with the final returned count.
+  async function incrementGlobalCount(n) {
+    if (!n || n < 1) return;
+    try {
+      const calls = Array.from({ length: n }, () =>
+        fetch(`${_COUNT_BASE}/${_COUNT_NS}/${_COUNT_KEY}/up`).then(r => r.json())
+      );
+      const results = await Promise.all(calls);
+      // Use the highest count returned (the last write wins)
+      const max = results.reduce((m, d) => (d.count != null && d.count > m ? d.count : m), 0);
+      if (max > 0) setHeroGlobalCount(max);
+    } catch (_) { /* fail silently */ }
+  }
+
+  function updateMatchCount() {
+    const el = document.getElementById('matchCount');
+    const n = selectedMatches.size;
+    el.innerHTML = n === 0
+      ? '0 matches selected'
+      : `<strong>${n}</strong> match${n === 1 ? '' : 'es'} selected`;
+  }
+
+  function clearAll() {
+    selectedMatches.clear();
+    customTitles.clear();
+    renderMatchTags();
+    buildMatchDropdown();
+    updateMatchCount();
+    renderPreview();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // INDUSTRY CHANGE
+  // ═══════════════════════════════════════════════════════════════
+
+  function onIndustryChange() {
+    selectedIndustry = document.getElementById('industrySelect').value;
+    renderPreview();
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // RENDER PREVIEW
+  // ═══════════════════════════════════════════════════════════════
+
+  function renderPreview() {
+    const preview = document.getElementById('preview');
+    const exportActions = document.getElementById('exportActions');
+    const exportNote = document.getElementById('exportNote');
+
+    const selected = MATCHES.filter(m => selectedMatches.has(m.id))
+      .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
+
+    if (selected.length === 0) {
+      preview.innerHTML = `<div class="preview-empty">
+        <span class="emoji">🗓️</span>
+        Select some matches above and choose your industry.<br>Your "meetings" will appear here, ready to go.
+      </div>`;
+      exportActions.style.display = 'none';
+      exportNote.style.display = 'none';
+      return;
+    }
+
+    if (!selectedIndustry) {
+      preview.innerHTML = `<div class="preview-empty">
+        <span class="emoji">🎭</span>
+        ${selected.length} match${selected.length > 1 ? 'es' : ''} selected — now pick your industry above<br>so we can make these look <em>very</em> professional.
+      </div>`;
+      exportActions.style.display = 'none';
+      exportNote.style.display = 'none';
+      return;
+    }
+
+    const grpLabel = m => GROUP_LABELS[m.group] || m.group;
+
+    preview.innerHTML = `<div class="preview-grid">` + selected.map(m => {
+      const title = customTitles.has(m.id) ? customTitles.get(m.id) : getMeetingName(m, selectedIndustry);
+      const desc  = getMeetingDescription(m, selectedIndustry);
+      const dt    = formatLocalDateTime(m.kickoff);
+      const end   = formatLocalTime(addHours(m.kickoff, 2));
+      const gStart = icsDate(m.kickoff).replace('Z','');
+      const gEnd   = icsDate(addHours(m.kickoff, 2)).replace('Z','');
+      const gUrl   = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${gStart}/${gEnd}&details=${encodeURIComponent(getMeetingDescription(m, selectedIndustry))}&ctz=UTC`;
+      return `<div class="preview-card">
+        <div class="preview-meeting-title">📅 <span class="editable-title" contenteditable="true" data-match-id="${m.id}" oninput="onTitleEdit(this)">${title}</span><span class="edit-hint">✏️ edit</span></div>
+        <div class="preview-meeting-meta">
+          <span class="preview-pill">🕐 ${dt} – ${end}</span>
+          <a class="gcal-link" href="${gUrl}" target="_blank" rel="noopener">+ Google Cal</a>
+        </div>
+        <div class="preview-desc">"${desc}"</div>
+        <div class="preview-actual">
+          (Actually: ${m.flagA} ${m.teamA} vs ${m.teamB} ${m.flagB} — ${grpLabel(m)}, ${m.city})
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+
+    exportActions.style.display = 'flex';
+    exportNote.style.display = 'block';
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ICS GENERATION
+  // ═══════════════════════════════════════════════════════════════
+
+  function escapeICS(str) {
+    return str.replace(/[\\;,]/g, c => '\\' + c).replace(/\n/g, '\\n');
+  }
+
+  function generateICS() {
+    const selected = MATCHES.filter(m => selectedMatches.has(m.id))
+      .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
+
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Book a Meeting with Football//bookameetingwithfootball//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+    ];
+
+    selected.forEach((m, i) => {
+      const title = getEffectiveMeetingName(m, selectedIndustry);
+      const desc  = getMeetingDescription(m, selectedIndustry);
+      const start = icsDate(m.kickoff);
+      const end   = icsDate(addHours(m.kickoff, 2));
+      const uid   = `${m.id}-${Date.now()}-${i}@bookameetingwithfootball`;
+
+      lines.push(
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTART:${start}`,
+        `DTEND:${end}`,
+        `SUMMARY:${escapeICS(title)}`,
+        `DESCRIPTION:${escapeICS(desc)}`,
+        'STATUS:CONFIRMED',
+        'TRANSP:OPAQUE',
+        'END:VEVENT',
+      );
+    });
+
+    lines.push('END:VCALENDAR');
+    return lines.join('\r\n');
+  }
+
+  function downloadICS() {
+    const content = generateICS();
+    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'totally-legit-meetings.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    incrementGlobalCount(selectedMatches.size);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // GOOGLE CALENDAR LINKS
+  // ═══════════════════════════════════════════════════════════════
+
+
+  // ═══════════════════════════════════════════════════════════════
+  // TIMEZONE DETECTION
+  // ═══════════════════════════════════════════════════════════════
+
+  function detectTimezone() {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      // Try to get a named abbreviation (AEST, EST, PST…) using en-US locale,
+      // which gives named abbrs more reliably than the user's locale
+      const sample = new Date().toLocaleTimeString('en-US', { timeZoneName: 'short' });
+      const parts  = sample.split(' ');
+      const named  = parts.find(p => /^[A-Z]{3,6}$/.test(p) && p !== 'AM' && p !== 'PM'); // pure letters, 3+ chars (AEST, EST)
+
+      let label;
+      if (named) {
+        // Got a proper abbreviation like AEST, EST, CET
+        label = named;
+      } else {
+        // Fall back to city/region from IANA name (e.g. "Sydney" from "Australia/Sydney")
+        const city = tz.split('/').pop().replace(/_/g, ' ');
+        label = city || tz;
+      }
+
+      document.getElementById('tzName').textContent = label;
+      document.getElementById('tzBadge').title = `All times shown in your local timezone: ${tz}`;
+      const exportEl = document.getElementById('exportTzName');
+      if (exportEl) exportEl.textContent = label;
+    } catch (e) {
+      // Silently fall back to "local time"
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // INIT
+  // ═══════════════════════════════════════════════════════════════
+
+  detectTimezone();
+  buildCountryDropdown();
+  buildMatchDropdown();
+  renderPreview();
+  fetchGlobalCount();
+  </script>
+</body>
+</html>
