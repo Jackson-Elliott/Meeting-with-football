@@ -132,9 +132,34 @@ html { scroll-behavior: smooth; }
       color: var(--accent);
     }
 
+    /* Calendar date numbers — one per grid square */
+    .pitch-date-grid {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .pitch-date-num {
+      position: absolute;
+      width: calc(100vw / 7);
+      height: calc(100vw / 7);
+      box-sizing: border-box;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      padding: 0 0 calc(100vw / 7 * 0.05) calc(100vw / 7 * 0.06);
+      font-family: 'Boldonse', 'Impact', sans-serif;
+      font-size: calc(100vw / 7 * 0.05);
+      line-height: 1;
+      color: rgba(98, 199, 100, 0.3);
+    }
+
     /* Floating calendar card — locked to one grid square (100vw/7 × 100vw/7) */
     .pitch-card {
       position: absolute;
+      z-index: 3;
       width: calc(100vw / 7);
       padding: calc(100vw / 7 * 0.08);
       box-sizing: border-box;
@@ -144,8 +169,8 @@ html { scroll-behavior: smooth; }
     .pitch-card svg { display: block; width: 100%; height: auto; }
 
     @keyframes card-float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
+      0%, 100% { transform: translateY(calc(100vw / 7 * 0.08)); }
+      50% { transform: translateY(calc(100vw / 7 * 0.03)); }
     }
 
     .hero-pitch > .pitch-card:nth-child(4)  { animation-delay: 0s; }
@@ -962,6 +987,9 @@ html { scroll-behavior: smooth; }
     <div class="hero-scroll">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
     </div>
+
+    <!-- Calendar date numbers on each grid square -->
+    <div class="pitch-date-grid" id="pitchDateGrid" aria-hidden="true"></div>
 
   </section>
 
@@ -2467,10 +2495,40 @@ html { scroll-behavior: smooth; }
   // INIT
   // ═══════════════════════════════════════════════════════════════
 
+  function buildPitchDateGrid() {
+    const grid = document.getElementById('pitchDateGrid');
+    const hero = document.querySelector('.hero-pitch');
+    if (!grid || !hero) return;
+
+    const cell = window.innerWidth / 7;
+    const rows = Math.ceil(hero.offsetHeight / cell) + 1;
+    const start = new Date(2026, 5, 1); // June 2026 — World Cup month
+    const parts = [];
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < 7; c++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + r * 7 + c);
+        parts.push(
+          `<span class="pitch-date-num" style="left:calc(${c}*100vw/7);top:calc(${r}*100vw/7)">${d.getDate()}</span>`
+        );
+      }
+    }
+
+    grid.innerHTML = parts.join('');
+  }
+
+  let _pitchDateResizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(_pitchDateResizeTimer);
+    _pitchDateResizeTimer = setTimeout(buildPitchDateGrid, 150);
+  });
+
   detectTimezone();
   buildCountryDropdown();
   buildMatchDropdown();
   renderPreview();
+  buildPitchDateGrid();
   fetchGlobalCount();
   </script>
 </body>
