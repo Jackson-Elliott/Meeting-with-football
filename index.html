@@ -685,6 +685,106 @@ html { scroll-behavior: smooth; }
       line-height: 1.6;
     }
 
+    .stealth-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 11px 14px 11px 12px;
+      margin-bottom: 24px;
+      background: transparent;
+      border: 1px dashed rgba(255, 255, 255, 0.14);
+      border-left: 3px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .stealth-bar.active {
+      border-color: rgba(255, 221, 0, 0.28);
+      border-left-color: var(--accent);
+      background: rgba(255, 221, 0, 0.04);
+    }
+
+    .stealth-bar-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .stealth-bar-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .stealth-bar.active .stealth-bar-label {
+      color: var(--accent);
+    }
+
+    .stealth-bar-desc {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-top: 3px;
+      line-height: 1.35;
+    }
+
+    .stealth-bar.active .stealth-bar-desc {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .stealth-switch {
+      position: relative;
+      flex-shrink: 0;
+      width: 48px;
+      height: 28px;
+    }
+
+    .stealth-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .stealth-switch-track {
+      position: absolute;
+      inset: 0;
+      background: var(--border-active);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .stealth-switch input:checked + .stealth-switch-track {
+      background: var(--accent);
+    }
+
+    .stealth-switch-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      pointer-events: none;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    .stealth-switch input:checked ~ .stealth-switch-thumb {
+      transform: translateX(20px);
+    }
+
+    .preview-desc-match {
+      display: block;
+      margin-top: 6px;
+      color: var(--text-muted);
+      font-style: normal;
+    }
+
     /* ── FOOTER ───────────────────────────────────────────── */
     footer {
       border-top: 1px solid var(--border);
@@ -766,6 +866,10 @@ html { scroll-behavior: smooth; }
       .pitch-block:nth-child(5) { display: none; }
       /* Show extra cards to fill the taller mobile hero */
       .pitch-card-mobile { display: block; }
+      .hero-content p {
+        font-size: clamp(12px, 3.6vw, 17px);
+        line-height: 1.42;
+      }
       .hero-pitch > .pitch-card:nth-child(4) {
         top: calc(-0.8 * 100vw / 7) !important;
         left: calc(5 * 100vw / 7) !important;
@@ -792,6 +896,9 @@ html { scroll-behavior: smooth; }
     @media (max-width: 430px) {
       .hero-content h1 {
         font-size: clamp(40px, 11.5vw, 52px);
+      }
+      .hero-content p {
+        font-size: clamp(11px, 3.2vw, 15px);
       }
       .hero-pitch > .pitch-card:nth-child(4),
       .hero-pitch > .pitch-card:nth-child(6) {
@@ -927,6 +1034,18 @@ html { scroll-behavior: smooth; }
           <option value="education">Education &amp; Academia</option>
           <option value="property">Property &amp; Real Estate</option>
           <option value="media">Media &amp; Entertainment</option>
+          <option value="construction">Construction</option>
+          <option value="architecture">Architecture</option>
+          <option value="insurance">Insurance</option>
+          <option value="logistics">Logistics &amp; Supply Chain</option>
+          <option value="manufacturing">Manufacturing</option>
+          <option value="hospitality">Hospitality &amp; Events</option>
+          <option value="accounting">Accounting &amp; Audit</option>
+          <option value="energy">Energy &amp; Utilities</option>
+          <option value="retail">Retail &amp; FMCG</option>
+          <option value="aviation">Aviation &amp; Aerospace</option>
+          <option value="nonprofit">Non-Profit &amp; NGO</option>
+          <option value="fashion">Fashion &amp; Luxury</option>
           <option value="other">Other</option>
         </select>
         <span class="select-arrow">
@@ -944,6 +1063,18 @@ html { scroll-behavior: smooth; }
         <h2>Add to your calendar</h2>
       </div>
       <p class="step-sub">Your totally legitimate meeting invites, ready to deploy.</p>
+
+      <div class="stealth-bar" id="stealthBar" style="display:none;">
+        <div class="stealth-bar-text">
+          <div class="stealth-bar-label">🤫 Stealth Mode</div>
+          <div class="stealth-bar-desc">If your boss is all over your calendar</div>
+        </div>
+        <label class="stealth-switch" aria-label="Toggle Stealth Mode">
+          <input type="checkbox" id="stealthToggle" onchange="onStealthToggle(this)">
+          <span class="stealth-switch-track"></span>
+          <span class="stealth-switch-thumb"></span>
+        </label>
+      </div>
 
       <div id="preview"></div>
 
@@ -1466,6 +1597,270 @@ html { scroll-behavior: smooth; }
         'Production schedule is tight. No delays.',
       ],
     },
+    construction: {
+      label: 'Construction',
+      templates: [
+        '{N}–{C} Site Programme Review',
+        'Contractor Coordination: {N} & {C} Works',
+        '{N} & {C} Health & Safety Briefing',
+        'Tender Review — {N}–{C} Package',
+        '{N}–{C} Practical Completion Meeting',
+        'Variation Order: {N} & {C} Scope',
+        '{N} & {C} Subcontractor Alignment',
+        'Site Inspection — {N}–{C} Phase {Q}',
+        '{N}–{C} Build Programme Workshop',
+        'Snagging Review: {N} & {C} Handover',
+      ],
+      descriptions: [
+        'PPE mandatory. Hi-vis on arrival.',
+        'Site access from 07:00. Do not be late.',
+        'Toolbox talk. All contractors required.',
+        'Rain date does not apply. Attend regardless.',
+        'Hard hat zone. Steel-caps required.',
+      ],
+    },
+    architecture: {
+      label: 'Architecture',
+      templates: [
+        '{N}–{C} Design Development Review',
+        'Planning Submission: {N} & {C} Scheme',
+        '{N} & {C} Client Design Presentation',
+        'Coordination Workshop — {N}–{C} Package',
+        '{N}–{C} Facade Design Review',
+        'RIBA Stage {Q}: {N} & {C} Sign-Off',
+        '{N} & {C} Masterplan Alignment',
+        'Design Team Meeting: {N}–{C}',
+        '{N}–{C} Planning Conditions Review',
+        'Concept Design: {N} & {C} Brief',
+      ],
+      descriptions: [
+        'Bring marked-up drawings. Scale ruler optional.',
+        'Client presentation. Smart casual minimum.',
+        'Design freeze in effect. No scope creep.',
+        'Revit model to be shared beforehand.',
+        'Crit session. Thick skin required.',
+      ],
+    },
+    insurance: {
+      label: 'Insurance',
+      templates: [
+        '{N}–{C} Underwriting Review',
+        'Claims Assessment: {N} & {C} Portfolio',
+        '{N} & {C} Actuarial Modelling Session',
+        'Policy Renewal — {N}–{C} Account',
+        '{N}–{C} Risk Exposure Briefing',
+        'Reinsurance Treaty: {N} & {C}',
+        '{N} & {C} Loss Adjustment Review',
+        'Broker Alignment — {N}–{C}',
+        '{N}–{C} Catastrophe Modelling Workshop',
+        'Coverage Review: {N} & {C} Programme',
+      ],
+      descriptions: [
+        'Confidential policyholder data. Do not discuss externally.',
+        'Underwriting committee. Quorum required.',
+        'Claims file to be reviewed prior to meeting.',
+        'Actuarial assumptions are not negotiable today.',
+        'Strictly confidential. No recording.',
+      ],
+    },
+    logistics: {
+      label: 'Logistics & Supply Chain',
+      templates: [
+        '{N}–{C} Freight Lane Review',
+        'Supply Chain Resilience: {N} & {C}',
+        '{N} & {C} Warehouse Optimisation',
+        'Last-Mile Strategy — {N}–{C}',
+        '{N}–{C} Customs & Compliance Briefing',
+        'Vendor SLA Review: {N} & {C}',
+        '{N} & {C} Distribution Network Sync',
+        'Inventory Planning — {N}–{C} Q{Q}',
+        '{N}–{C} Procurement Alignment',
+        'Cold Chain Review: {N} & {C}',
+      ],
+      descriptions: [
+        'ETA is non-negotiable. Attendance mandatory.',
+        'Bring shipment manifests. Delays cost money.',
+        '3PL partners on the call. Stay professional.',
+        'Peak season planning. No rescheduling.',
+        'Dock appointment confirmed. Be on time.',
+      ],
+    },
+    manufacturing: {
+      label: 'Manufacturing',
+      templates: [
+        '{N}–{C} Production Line Review',
+        'Quality Assurance: {N} & {C} Standards',
+        '{N} & {C} Lean Manufacturing Workshop',
+        'Supplier Audit — {N}–{C}',
+        '{N}–{C} Capacity Planning Session',
+        'OEE Review: {N} & {C} Plant',
+        '{N} & {C} BOM Cost Optimisation',
+        'Factory Floor Walk — {N}–{C}',
+        '{N}–{C} ISO Compliance Briefing',
+        'Shift Handover: {N} & {C} Operations',
+      ],
+      descriptions: [
+        'Safety goggles on the factory floor.',
+        'Production halt if quorum not met.',
+        'GMP standards apply. Wash hands on entry.',
+        'Andon cord is not a metaphor. Be present.',
+        'Kaizen session. Improvement ideas welcome.',
+      ],
+    },
+    hospitality: {
+      label: 'Hospitality & Events',
+      templates: [
+        '{N}–{C} Venue Partnership Review',
+        'Event Operations: {N} & {C} Programme',
+        '{N} & {C} Catering & Banqueting Brief',
+        'Conference Planning — {N}–{C}',
+        '{N}–{C} Guest Experience Workshop',
+        'Hotel Group Sync: {N} & {C}',
+        '{N} & {C} F&B Revenue Review',
+        'Run of Show — {N}–{C} Event',
+        '{N}–{C} Concierge Standards Briefing',
+        'VIP Arrival: {N} & {C} Protocol',
+      ],
+      descriptions: [
+        'Service with a smile. Even if you are not smiling.',
+        'Black tie optional. Punctuality mandatory.',
+        'Guest-facing role. Phones on silent.',
+        'The show must go on. No cancellations.',
+        'Pre-function briefing. Be five minutes early.',
+      ],
+    },
+    accounting: {
+      label: 'Accounting & Audit',
+      templates: [
+        '{N}–{C} Audit Planning Meeting',
+        'Year-End Close: {N} & {C} Accounts',
+        '{N} & {C} Tax Compliance Review',
+        'Management Accounts — {N}–{C} Q{Q}',
+        '{N}–{C} IFRS Alignment Workshop',
+        'External Audit: {N} & {C} Fieldwork',
+        '{N} & {C} Transfer Pricing Review',
+        'Statutory Accounts — {N}–{C}',
+        '{N}–{C} Internal Controls Assessment',
+        'Forensic Review: {N} & {C} Ledger',
+      ],
+      descriptions: [
+        'Bring the trial balance. Reconciled.',
+        'Audit committee. Papers circulated Friday.',
+        'Deadline is statutory. Not flexible.',
+        'Working papers to be complete beforehand.',
+        'Numbers do not lie. Neither should you.',
+      ],
+    },
+    energy: {
+      label: 'Energy & Utilities',
+      templates: [
+        '{N}–{C} Grid Integration Review',
+        'Renewables Pipeline: {N} & {C}',
+        '{N} & {C} Regulatory Filing Session',
+        'Asset Maintenance — {N}–{C} Plant',
+        '{N}–{C} Power Purchase Agreement Review',
+        'Net Zero Strategy: {N} & {C}',
+        '{N} & {C} Transmission Upgrade Briefing',
+        'Commodity Hedging — {N}–{C}',
+        '{N}–{C} Environmental Compliance Review',
+        'Outage Planning: {N} & {C} Network',
+      ],
+      descriptions: [
+        'Critical infrastructure. Attendance logged.',
+        'Safety briefing before site access.',
+        'Regulator may dial in. Stay on script.',
+        'Load-shedding schedule does not apply here.',
+        'Hard hat and arc flash gear if site visit.',
+      ],
+    },
+    retail: {
+      label: 'Retail & FMCG',
+      templates: [
+        '{N}–{C} Category Review',
+        'Merchandising Strategy: {N} & {C}',
+        '{N} & {C} Trade Terms Negotiation',
+        'Store Rollout — {N}–{C} Region',
+        '{N}–{C} Promotional Calendar Planning',
+        'Shelf Space Review: {N} & {C}',
+        '{N} & {C} Supply Agreement Briefing',
+        'Footfall Analysis — {N}–{C}',
+        '{N}–{C} Private Label Development',
+        'Range Reset: {N} & {C} Assortment',
+      ],
+      descriptions: [
+        'Sell-in meeting. Bring the sell-through data.',
+        'Buyer is on a tight schedule. Do not overrun.',
+        'Planogram changes effective Monday.',
+        'Promo mechanics to be signed off today.',
+        'The buyer always wins. Accept it.',
+      ],
+    },
+    aviation: {
+      label: 'Aviation & Aerospace',
+      templates: [
+        '{N}–{C} Route Planning Review',
+        'Fleet Deployment: {N} & {C}',
+        '{N} & {C} Airworthiness Briefing',
+        'Slot Coordination — {N}–{C}',
+        '{N}–{C} MRO Schedule Alignment',
+        'Cabin Product Review: {N} & {C}',
+        '{N} & {C} Safety Management System Sync',
+        'Ground Operations — {N}–{C}',
+        '{N}–{C} Codeshare Agreement Review',
+        'Flight Operations: {N} & {C} Brief',
+      ],
+      descriptions: [
+        'NOTAM issued. This meeting is mandatory.',
+        'Crew rest rules apply. Keep it concise.',
+        'Security clearance required for airside access.',
+        'Weather diversion not accepted as excuse.',
+        'Pre-flight briefing. Wheels up on time.',
+      ],
+    },
+    nonprofit: {
+      label: 'Non-Profit & NGO',
+      templates: [
+        '{N}–{C} Programme Impact Review',
+        'Grant Reporting: {N} & {C} Initiative',
+        '{N} & {C} Donor Stewardship Meeting',
+        'Field Operations — {N}–{C}',
+        '{N}–{C} Advocacy Strategy Session',
+        'Board Sub-Committee: {N} & {C}',
+        '{N} & {C} Fundraising Alignment',
+        'M&E Framework — {N}–{C}',
+        '{N}–{C} Partnership MOU Review',
+        'Community Engagement: {N} & {C}',
+      ],
+      descriptions: [
+        'Mission-critical. Literally.',
+        'Donor confidentiality applies.',
+        'Bring impact metrics. Stories optional.',
+        'Volunteer schedules depend on this.',
+        'Grant deadline is immovable. Attend.',
+      ],
+    },
+    fashion: {
+      label: 'Fashion & Luxury',
+      templates: [
+        '{N}–{C} Collection Preview',
+        'Buying Appointment: {N} & {C}',
+        '{N} & {C} Trend Forecasting Session',
+        'Lookbook Review — {N}–{C}',
+        '{N}–{C} Wholesale Terms Negotiation',
+        'Runway Production: {N} & {C}',
+        '{N} & {C} Brand Collaboration Brief',
+        'Fabric Sourcing — {N}–{C}',
+        '{N}–{C} Retail Placement Review',
+        'Capsule Collection: {N} & {C} Launch',
+      ],
+      descriptions: [
+        'Dress code: impeccable. Obviously.',
+        'Sample pieces on display. Handle with care.',
+        'Fashion week waits for no one.',
+        'NDA in effect. No front-row photos.',
+        'The buyer decides. Your opinion is noted.',
+      ],
+    },
     other: {
       label: 'Other',
       templates: [
@@ -1498,6 +1893,7 @@ html { scroll-behavior: smooth; }
 
   const selectedMatches = new Set();
   let selectedIndustry = '';
+  let stealthMode = false;
   const customTitles = new Map();
 
   // ═══════════════════════════════════════════════════════════════
@@ -1521,18 +1917,50 @@ html { scroll-behavior: smooth; }
   // MEETING NAME / DESCRIPTION GENERATION
   // ═══════════════════════════════════════════════════════════════
 
+  function fillMeetingTemplate(template, match, replacements) {
+    const q = new Date(match.kickoff).getUTCMonth() < 6 ? '2' : '3';
+    return template
+      .replace('{N}',  replacements.n)
+      .replace('{N2}', replacements.n2)
+      .replace('{C}',  replacements.c)
+      .replace('{C2}', replacements.c2)
+      .replace('{Q}',  q);
+  }
+
   function getMeetingName(match, industry) {
     if (!industry || !INDUSTRIES[industry]) return 'Important Meeting (Do Not Cancel)';
-    const { templates } = INDUSTRIES[industry];
-    const template = pick(templates, match.id, 0);
-    const q = new Date(match.kickoff).getUTCMonth() < 6 ? '2' : '3';
+    const template = pick(INDUSTRIES[industry].templates, match.id, 0);
+    return fillMeetingTemplate(template, match, {
+      n: match.teamA,
+      n2: match.teamB,
+      c: match.teamB,
+      c2: match.teamA,
+    });
+  }
 
+  function stripNamesFromTemplate(template) {
     return template
-      .replace('{N}',  match.teamA)
-      .replace('{N2}', match.teamB)
-      .replace('{C}',  match.teamB)
-      .replace('{C2}', match.teamA)
-      .replace('{Q}',  q);
+      .replace(/\{N2?\}/g, '')
+      .replace(/\{C2?\}/g, '')
+      .replace(/\s+v\.\s*/gi, ' ')
+      .replace(/\s*[–—&]\s*/g, ' ')
+      .replace(/:\s*$/g, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  function getStealthMeetingName(match, industry) {
+    if (!industry || !INDUSTRIES[industry]) return 'Important Meeting (Do Not Cancel)';
+    const template = pick(INDUSTRIES[industry].templates, match.id, 0);
+    let title = stripNamesFromTemplate(template);
+    const q = new Date(match.kickoff).getUTCMonth() < 6 ? '2' : '3';
+    title = title.replace(/\{Q\}/g, q).trim();
+    // Remove orphaned subtitle fragments left after stripping names
+    title = title.replace(/:\s*[A-Za-z][A-Za-z\s]{0,24}$/g, '').trim();
+    if (!title) {
+      title = pick(INDUSTRIES.other.templates, match.id, 0);
+    }
+    return title;
   }
 
   function getMeetingDescription(match, industry) {
@@ -1544,14 +1972,36 @@ html { scroll-behavior: smooth; }
     return desc.replace('{Q}', q);
   }
 
+  function getMatchRevealText(match) {
+    const stage = GROUP_LABELS[match.group] || match.group;
+    return `🤫 ${match.flagA} ${match.teamA} vs ${match.teamB} ${match.flagB} · ${stage}`;
+  }
+
+  function getExportDescription(match, industry) {
+    const base = getMeetingDescription(match, industry);
+    if (!stealthMode) return base;
+    return `${base}\n\n${getMatchRevealText(match)}`;
+  }
+
   function getMeetingLocation(match) {
     return pick(ROOM_NAMES, match.id + 'room', 0);
   }
 
   // Returns custom title if the user edited it, otherwise the generated one
   function getEffectiveMeetingName(match, industry) {
-    if (customTitles.has(match.id)) return customTitles.get(match.id) || getMeetingName(match, industry);
-    return getMeetingName(match, industry);
+    if (customTitles.has(match.id)) {
+      const custom = customTitles.get(match.id);
+      if (custom) return custom;
+    }
+    return stealthMode
+      ? getStealthMeetingName(match, industry)
+      : getMeetingName(match, industry);
+  }
+
+  function onStealthToggle(el) {
+    stealthMode = el.checked;
+    document.getElementById('stealthBar').classList.toggle('active', stealthMode);
+    renderPreview();
   }
 
   function onTitleEdit(el) {
@@ -1804,6 +2254,8 @@ html { scroll-behavior: smooth; }
     const preview = document.getElementById('preview');
     const exportActions = document.getElementById('exportActions');
     const exportNote = document.getElementById('exportNote');
+    const stealthBar = document.getElementById('stealthBar');
+    const stealthToggle = document.getElementById('stealthToggle');
 
     const selected = MATCHES.filter(m => selectedMatches.has(m.id))
       .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
@@ -1815,6 +2267,7 @@ html { scroll-behavior: smooth; }
       </div>`;
       exportActions.style.display = 'none';
       exportNote.style.display = 'none';
+      stealthBar.style.display = 'none';
       return;
     }
 
@@ -1825,25 +2278,37 @@ html { scroll-behavior: smooth; }
       </div>`;
       exportActions.style.display = 'none';
       exportNote.style.display = 'none';
+      stealthBar.style.display = 'none';
       return;
     }
 
+    stealthBar.style.display = 'flex';
+    stealthBar.classList.toggle('active', stealthMode);
+    stealthToggle.checked = stealthMode;
+
     preview.innerHTML = `<div class="preview-grid">` + selected.map(m => {
-      const title = customTitles.has(m.id) ? customTitles.get(m.id) : getMeetingName(m, selectedIndustry);
-      const desc  = getMeetingDescription(m, selectedIndustry);
+      const title = getEffectiveMeetingName(m, selectedIndustry);
+      const desc  = getExportDescription(m, selectedIndustry);
+      const baseDesc = getMeetingDescription(m, selectedIndustry);
       const dt    = formatLocalDateTime(m.kickoff);
       const end   = formatLocalTime(addHours(m.kickoff, 2));
       const gStart = icsDate(m.kickoff).replace('Z','');
       const gEnd   = icsDate(addHours(m.kickoff, 2)).replace('Z','');
-      const gUrl   = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${gStart}/${gEnd}&details=${encodeURIComponent(getMeetingDescription(m, selectedIndustry))}&ctz=UTC`;
+      const gUrl   = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${gStart}/${gEnd}&details=${encodeURIComponent(desc)}&ctz=UTC`;
+      const akaLine = stealthMode
+        ? ''
+        : `<div class="preview-aka">🤫 ${m.flagA} ${m.teamA} vs ${m.teamB} ${m.flagB}</div>`;
+      const descBlock = stealthMode
+        ? `<div class="preview-desc">"${baseDesc}"<span class="preview-desc-match">${getMatchRevealText(m)}</span></div>`
+        : `<div class="preview-desc">"${baseDesc}"</div>`;
       return `<div class="preview-card">
         <div class="preview-meeting-title">📅 <span class="editable-title" contenteditable="true" data-match-id="${m.id}" oninput="onTitleEdit(this)">${title}</span><span class="edit-hint">✏️ edit</span></div>
-        <div class="preview-aka">🤫 ${m.flagA} ${m.teamA} vs ${m.teamB} ${m.flagB}</div>
+        ${akaLine}
         <div class="preview-meeting-meta">
           <span class="preview-pill">🕐 ${dt} – ${end}</span>
           <a class="gcal-link" href="${gUrl}" target="_blank" rel="noopener">+ Google Calendar</a>
         </div>
-        <div class="preview-desc">"${desc}"</div>
+        ${descBlock}
         <div class="preview-mobile-actions">
           <a class="gcal-link gcal-link-mobile" href="${gUrl}" target="_blank" rel="noopener">+ Google Calendar</a>
           <button type="button" class="ics-link-mobile" onclick="openEventICS('${m.id}')">+ Calendar</button>
@@ -1877,7 +2342,7 @@ html { scroll-behavior: smooth; }
 
     selected.forEach((m, i) => {
       const title = getEffectiveMeetingName(m, selectedIndustry);
-      const desc  = getMeetingDescription(m, selectedIndustry);
+      const desc  = getExportDescription(m, selectedIndustry);
       const start = icsDate(m.kickoff);
       const end   = icsDate(addHours(m.kickoff, 2));
       const uid   = `${m.id}-${Date.now()}-${i}@bookameetingwithfootball`;
@@ -1951,7 +2416,7 @@ html { scroll-behavior: smooth; }
     // Open first tab synchronously (within user gesture — never blocked)
     const openTab = (m) => {
       const title = getEffectiveMeetingName(m, selectedIndustry);
-      const desc  = getMeetingDescription(m, selectedIndustry);
+      const desc  = getExportDescription(m, selectedIndustry);
       const start = icsDate(m.kickoff).replace('Z', '');
       const end   = icsDate(addHours(m.kickoff, 2)).replace('Z', '');
       const url = new URL('https://calendar.google.com/calendar/render');
